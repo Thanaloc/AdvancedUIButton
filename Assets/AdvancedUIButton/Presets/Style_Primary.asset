@@ -1,0 +1,64 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8568909c184a6d468db4a3292ab6659, type: 3}
+  m_Name: Style_Primary
+  m_EditorClassIdentifier: Assembly-CSharp::AdvancedUI.UIButtonStyle
+  background:
+    colors:
+      normal: {r: 0.14509805, g: 0.3882353, b: 0.92156863, a: 1}
+      highlighted: {r: 0.11372549, g: 0.30588236, b: 0.84705883, a: 1}
+      pressed: {r: 0.11764706, g: 0.2509804, b: 0.6862745, a: 1}
+      selected: {r: 0.11764706, g: 0.2509804, b: 0.6862745, a: 1}
+      selectedHighlighted: {r: 0.11764706, g: 0.22745098, b: 0.5411765, a: 1}
+      focused: {r: 0.23137255, g: 0.50980395, b: 0.9647059, a: 1}
+      disabled: {r: 0.5764706, g: 0.77254903, b: 0.99215686, a: 0.5}
+  label:
+    colors:
+      normal: {r: 1, g: 1, b: 1, a: 1}
+      highlighted: {r: 1, g: 1, b: 1, a: 1}
+      pressed: {r: 1, g: 1, b: 1, a: 0.9}
+      selected: {r: 1, g: 1, b: 1, a: 1}
+      selectedHighlighted: {r: 1, g: 1, b: 1, a: 1}
+      focused: {r: 1, g: 1, b: 1, a: 1}
+      disabled: {r: 1, g: 1, b: 1, a: 0.5}
+  icon:
+    colors:
+      normal: {r: 1, g: 1, b: 1, a: 1}
+      highlighted: {r: 1, g: 1, b: 1, a: 1}
+      pressed: {r: 1, g: 1, b: 1, a: 0.9}
+      selected: {r: 1, g: 1, b: 1, a: 1}
+      selectedHighlighted: {r: 1, g: 1, b: 1, a: 1}
+      focused: {r: 1, g: 1, b: 1, a: 1}
+      disabled: {r: 1, g: 1, b: 1, a: 0.5}
+  animation:
+    enableScale: 1
+    transform:
+      normalScale: {x: 1, y: 1, z: 1}
+      highlightedScale: {x: 1.04, y: 1.04, z: 1}
+      pressedScale: {x: 0.96, y: 0.96, z: 1}
+      selectedScale: {x: 1, y: 1, z: 1}
+      focusedScale: {x: 1.02, y: 1.02, z: 1}
+      disabledScale: {x: 1, y: 1, z: 1}
+    scaleDuration: 0.12
+    scaleEasing: 5
+    colorDuration: 0.1
+    colorEasing: 2
+    ignoreTimeScale: 1
+  audio:
+    hoverEnter: {fileID: 0}
+    press: {fileID: 0}
+    select: {fileID: 0}
+    disabled: {fileID: 0}
+    volume: 1
+    pitch: 1
+    randomizePitch: 0
+    pitchVariance: 0.1
