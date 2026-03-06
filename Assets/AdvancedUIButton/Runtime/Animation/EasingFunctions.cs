@@ -1,3 +1,6 @@
+// AdvancedUIButton -- Advanced UI Button System for Unity
+// Copyright (c) 2025 AdvancedUI. All rights reserved.
+
 using UnityEngine;
 
 namespace AdvancedUI
@@ -25,6 +28,8 @@ namespace AdvancedUI
                 case EasingType.BackInOut:  return BackInOut(t);
                 case EasingType.ElasticOut: return ElasticOut(t);
                 case EasingType.BounceOut:  return BounceOut(t);
+                case EasingType.ExpoOut:    return t == 1f ? 1f : 1f - Mathf.Pow(2f, -10f * t);
+                case EasingType.CircOut:    return Mathf.Sqrt(1f - Mathf.Pow(t - 1f, 2f));
                 default:                    return t;
             }
         }

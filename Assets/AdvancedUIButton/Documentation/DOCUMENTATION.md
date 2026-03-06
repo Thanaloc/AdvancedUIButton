@@ -2,6 +2,7 @@
 
 ## Table of Contents
 
+0. [Requirements](#0-requirements)
 1. [Setting up your first button](#1-setting-up-your-first-button)
 2. [Graphics and roles](#2-graphics-and-roles)
 3. [Styles and presets](#3-styles-and-presets)
@@ -12,6 +13,17 @@
 8. [Audio](#8-audio)
 9. [Scripting reference](#9-scripting-reference)
 10. [Tips and common setups](#10-tips-and-common-setups)
+
+---
+
+## 0. Requirements
+
+| Requirement | Details |
+|---|---|
+| Unity version | 2021.3 LTS minimum — Unity 6 recommended |
+| TextMeshPro | Required. Used for all label graphic transitions. |
+| Render pipeline | Compatible with Built-in RP, URP, and HDRP. No shader changes needed. |
+| Other packages | None. No external dependencies. |
 
 ---
 
@@ -125,11 +137,13 @@ Recommended easing: `BackOut` for a springy feel, `EaseOut` for smooth.
 | EaseIn | Starts slow, ends fast |
 | EaseOut | Starts fast, ends slow (default) |
 | EaseInOut | Slow at both ends |
-| BackOut | Overshoots then settles -- springy |
-| ElasticOut | Bouncy, elastic |
-| BounceOut | Physical bounce |
-| ExpoOut | Very fast start, long tail |
-| CircOut | Smooth arc |
+| BackIn | Pulls back before moving |
+| BackOut | Overshoots then settles — springy |
+| BackInOut | Pull back then overshoot |
+| ElasticOut | Bouncy, elastic snap |
+| BounceOut | Physical bounce at end |
+| ExpoOut | Explosive start, very long smooth tail |
+| CircOut | Arc-shaped, smooth and round |
 
 ### Ignore Time Scale
 
@@ -333,3 +347,15 @@ Any class that inherits from `UnityEngine.UI.Graphic` works as a target. This in
 - The tween system uses struct-based values -- zero GC allocation per frame in steady state
 - Ripple uses an object pool -- no Instantiate/Destroy per click
 - The Hold coroutine stops automatically when released and restarts only on press
+---
+
+## 11. Known Limitations
+
+**No native automatic layout support**
+`AdvancedUIButton` uses scale animation on the RectTransform. This conflicts with Unity's automatic layout groups (`HorizontalLayoutGroup`, `VerticalLayoutGroup`, `GridLayoutGroup`), which override RectTransform size every frame. To use buttons inside a layout group, disable scale animation or use a wrapper GameObject for the layout and place the button inside it without a layout element on the button itself.
+
+**Ripple pool is fixed at initialization**
+The ripple pool allocates all slots on `Awake`. If you change `Max Pool Size` in the Inspector after the scene has started, the change takes effect only after reloading the scene. This is by design to avoid mid-session allocations.
+
+**No nested Selectable support**
+Unity does not support nested `Selectable` components (a Selectable inside another Selectable). Placing an `AdvancedUIButton` inside another `AdvancedUIButton` in the hierarchy will cause unpredictable pointer event routing. Use sibling or parent/child GameObjects without overlapping Selectables.

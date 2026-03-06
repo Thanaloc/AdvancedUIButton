@@ -44,16 +44,16 @@ namespace AdvancedUI
         private struct RippleEntry
         {
             public RectTransform rectTransform;
-            public Image image;
-            public bool active;
-            public float elapsed;
-            public float targetSize;
+            public Image         image;
+            public bool          active;
+            public float         elapsed;
+            public float         targetSize;
         }
 
         private RippleEntry[] _pool;
-        private int _activeCount;
-        private Coroutine _tickCoroutine;
-        private float _maxSize;
+        private int           _activeCount;
+        private Coroutine     _tickCoroutine;
+        private float         _maxSize;
 
         // Lifecycle
 
@@ -101,7 +101,7 @@ namespace AdvancedUI
             if (_maxSize <= 0f) return;
 
             Canvas canvas = GetComponentInParent<Canvas>();
-            Camera cam = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+            Camera cam    = (canvas != null && canvas.renderMode != RenderMode.ScreenSpaceOverlay)
                 ? canvas.worldCamera : null;
 
             if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -113,23 +113,23 @@ namespace AdvancedUI
 
             // Compute the radius needed to fully cover the rect from this click point.
             // This ensures the ripple always reaches every corner regardless of click origin.
-            Rect rect = GetComponent<RectTransform>().rect;
-            float left = local.x - rect.xMin;
+            Rect rect  = GetComponent<RectTransform>().rect;
+            float left  = local.x - rect.xMin;
             float right = rect.xMax - local.x;
             float bottom = local.y - rect.yMin;
-            float top = rect.yMax - local.y;
+            float top    = rect.yMax - local.y;
             float maxDist = Mathf.Sqrt(
                 Mathf.Max(left, right) * Mathf.Max(left, right) +
                 Mathf.Max(bottom, top) * Mathf.Max(bottom, top)
             ) * 2f; // *2 because sizeDelta is diameter, not radius
 
             ref RippleEntry entry = ref _pool[slot];
-            entry.elapsed = 0f;
+            entry.elapsed    = 0f;
             entry.targetSize = maxDist;
-            entry.active = true;
+            entry.active     = true;
             entry.rectTransform.anchoredPosition = local;
-            entry.rectTransform.sizeDelta = Vector2.zero;
-            entry.image.color = _rippleColor;
+            entry.rectTransform.sizeDelta        = Vector2.zero;
+            entry.image.color                    = _rippleColor;
             entry.image.gameObject.SetActive(true);
             _activeCount++;
 
@@ -146,15 +146,15 @@ namespace AdvancedUI
         {
             if (s_circleSprite != null) return s_circleSprite;
 
-            const int size = 64;
+            const int size   = 64;
             const float half = size * 0.5f;
-            const float r = half - 1f;
+            const float r    = half - 1f;
 
             Texture2D tex = new Texture2D(size, size, TextureFormat.RGBA32, false)
             {
-                hideFlags = HideFlags.HideAndDontSave,
+                hideFlags  = HideFlags.HideAndDontSave,
                 filterMode = FilterMode.Bilinear,
-                wrapMode = TextureWrapMode.Clamp
+                wrapMode   = TextureWrapMode.Clamp
             };
 
             Color[] pixels = new Color[size * size];
@@ -162,8 +162,8 @@ namespace AdvancedUI
             {
                 for (int x = 0; x < size; x++)
                 {
-                    float dx = x - half + 0.5f;
-                    float dy = y - half + 0.5f;
+                    float dx   = x - half + 0.5f;
+                    float dy   = y - half + 0.5f;
                     float dist = Mathf.Sqrt(dx * dx + dy * dy);
                     // soft edge over 2 pixels
                     float alpha = Mathf.Clamp01(1f - (dist - (r - 2f)) / 2f);
@@ -203,23 +203,23 @@ namespace AdvancedUI
                 RectTransform rt = go.GetComponent<RectTransform>();
                 rt.anchorMin = new Vector2(0.5f, 0.5f);
                 rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.pivot = new Vector2(0.5f, 0.5f);
+                rt.pivot     = new Vector2(0.5f, 0.5f);
                 rt.sizeDelta = Vector2.zero;
 
-                Image img = go.GetComponent<Image>();
-                img.color = _rippleColor;
+                Image img         = go.GetComponent<Image>();
+                img.color         = _rippleColor;
                 img.raycastTarget = false;
-                img.sprite = circle;
+                img.sprite        = circle;
 
                 go.SetActive(false);
 
                 _pool[i] = new RippleEntry
                 {
                     rectTransform = rt,
-                    image = img,
-                    active = false,
-                    elapsed = 0f,
-                    targetSize = 0f
+                    image         = img,
+                    active        = false,
+                    elapsed       = 0f,
+                    targetSize    = 0f
                 };
             }
         }
@@ -257,7 +257,7 @@ namespace AdvancedUI
                     _pool[i].rectTransform.sizeDelta = new Vector2(size, size);
 
                     Color c = _rippleColor;
-                    c.a = _rippleColor.a * (1f - t);
+                    c.a     = _rippleColor.a * (1f - t);
                     _pool[i].image.color = c;
 
                     if (_pool[i].elapsed >= _duration)
@@ -278,9 +278,9 @@ namespace AdvancedUI
 
         private void RecalculateSize()
         {
-            Rect r = GetComponent<RectTransform>().rect;
-            float w = r.width;
-            float h = r.height;
+            Rect r   = GetComponent<RectTransform>().rect;
+            float w  = r.width;
+            float h  = r.height;
             _maxSize = Mathf.Sqrt(w * w + h * h) * 1.15f;
         }
 
@@ -289,14 +289,14 @@ namespace AdvancedUI
             for (int i = 0; i < _pool.Length; i++)
                 if (!_pool[i].active) return i;
 
-            // Pool full: recycle oldest
-            int oldest = 0;
-            float maxElapsed = -1f;
+            // Pool full: recycle the slot whose animation is most advanced (closest to finishing).
+            int   oldest      = 0;
+            float mostElapsed = -1f;
             for (int i = 0; i < _pool.Length; i++)
             {
-                if (_pool[i].elapsed <= maxElapsed) continue;
-                maxElapsed = _pool[i].elapsed;
-                oldest = i;
+                if (_pool[i].elapsed <= mostElapsed) continue;
+                mostElapsed = _pool[i].elapsed;
+                oldest      = i;
             }
             _pool[oldest].active = false;
             _pool[oldest].image.gameObject.SetActive(false);

@@ -59,7 +59,6 @@ namespace AdvancedUI
 
             switch (next)
             {
-                case ButtonState.Highlighted:
                 case ButtonState.SelectedHighlighted:
                     // Only play hover sound when entering hover from a non-hover state.
                     if (previous != ButtonState.Highlighted &&
@@ -73,14 +72,25 @@ namespace AdvancedUI
 
                 case ButtonState.Selected:
                     // next == Selected always means we just became selected.
-                    // Deselect sound is handled in the Normal case below.
+                    // Deselect sound is handled in the Normal/Highlighted cases below.
                     Play(_onSelect);
                     break;
 
                 case ButtonState.Normal:
-                    // Transitioning from Selected to Normal = deselection.
-                    if (previous == ButtonState.Selected)
+                    // Transitioning from Selected or SelectedHighlighted to Normal = deselection.
+                    if (previous == ButtonState.Selected ||
+                        previous == ButtonState.SelectedHighlighted)
                         Play(_onDeselect);
+                    break;
+
+                case ButtonState.Highlighted:
+                    // Pointer re-entered after click that deselected from SelectedHighlighted.
+                    // previous == SelectedHighlighted means the user clicked while hovering,
+                    // which deselected the button and left the pointer still over it.
+                    if (previous == ButtonState.SelectedHighlighted)
+                        Play(_onDeselect);
+                    else if (previous != ButtonState.Highlighted)
+                        Play(_onHoverEnter);
                     break;
 
                 case ButtonState.Disabled:
@@ -109,14 +119,14 @@ namespace AdvancedUI
             if (style == null) return;
 
             UIButtonStyle.AudioStyle a = style.audio;
-            _onHoverEnter = a.hoverEnter;
-            _onPress = a.press;
-            _onSelect = a.select;
-            _onDisabled = a.disabled;
-            _volume = a.volume;
-            _pitch = a.pitch;
-            _randomizePitch = a.randomizePitch;
-            _pitchVariance = a.pitchVariance;
+            _onHoverEnter    = a.hoverEnter;
+            _onPress         = a.press;
+            _onSelect        = a.select;
+            _onDisabled      = a.disabled;
+            _volume          = a.volume;
+            _pitch           = a.pitch;
+            _randomizePitch  = a.randomizePitch;
+            _pitchVariance   = a.pitchVariance;
         }
     }
 }

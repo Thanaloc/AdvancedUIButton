@@ -22,10 +22,10 @@ namespace AdvancedUI.Demo
 
         [Header("Hold")]
         public AdvancedUIButton holdButton;
-        public RectTransform holdFill;
-        public float holdFillWidth = 160f;
+        public RectTransform    holdFill;
+        public float            holdFillWidth = 160f;
 
-        private static readonly Color OnColor = new Color(0.29f, 0.84f, 0.44f);
+        private static readonly Color OnColor  = new Color(0.29f, 0.84f, 0.44f);
         private static readonly Color OffColor = new Color(0.93f, 0.27f, 0.27f);
         private int _clicks;
 
@@ -34,7 +34,7 @@ namespace AdvancedUI.Demo
             // Toggle label initial state
             if (toggleLabel != null)
             {
-                toggleLabel.text = "OFF";
+                toggleLabel.text  = "OFF";
                 toggleLabel.color = OffColor;
             }
 
@@ -57,7 +57,7 @@ namespace AdvancedUI.Demo
         public void OnToggleSelected()
         {
             if (toggleLabel == null) return;
-            toggleLabel.text = "ON";
+            toggleLabel.text  = "ON";
             toggleLabel.color = OnColor;
         }
 
@@ -65,7 +65,7 @@ namespace AdvancedUI.Demo
         public void OnToggleDeselected()
         {
             if (toggleLabel == null) return;
-            toggleLabel.text = "OFF";
+            toggleLabel.text  = "OFF";
             toggleLabel.color = OffColor;
         }
 
