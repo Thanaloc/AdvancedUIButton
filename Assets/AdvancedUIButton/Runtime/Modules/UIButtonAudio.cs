@@ -119,14 +119,15 @@ namespace AdvancedUI
             if (style == null) return;
 
             UIButtonStyle.AudioStyle a = style.audio;
-            _onHoverEnter    = a.hoverEnter;
-            _onPress         = a.press;
-            _onSelect        = a.select;
-            _onDisabled      = a.disabled;
-            _volume          = a.volume;
-            _pitch           = a.pitch;
-            _randomizePitch  = a.randomizePitch;
-            _pitchVariance   = a.pitchVariance;
+            _onHoverEnter = a.hoverEnter;
+            _onPress = a.press;
+            _onSelect = a.select;
+            _onDeselect = a.deselect;
+            _onDisabled = a.disabled;
+            _volume = a.volume;
+            _pitch = a.pitch;
+            _randomizePitch = a.randomizePitch;
+            _pitchVariance = a.pitchVariance;
         }
     }
 }

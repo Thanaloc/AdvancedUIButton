@@ -3,42 +3,50 @@
 
 using UnityEngine;
 using TMPro;
-using UnityEngine.UI;
 
 namespace AdvancedUI.Demo
 {
     /// <summary>
     /// Central controller for the demo scene.
-    /// Holds references to all interactive labels and wires hold events at runtime.
+    /// Holds serialized references to UI labels and the hold button.
+    /// The DemoSceneBuilder wires all fields via SerializedObject at build time.
+    /// Hold events are subscribed at runtime via <see cref="AdvancedUIButton.HoldConfig"/>.
     /// </summary>
     [AddComponentMenu("AdvancedUI/Demo/Demo Controller")]
     public sealed class DemoController : MonoBehaviour
     {
         [Header("Standard")]
-        public TextMeshProUGUI clickLabel;
+        [Tooltip("Label that displays the running click count.")]
+        [SerializeField] private TextMeshProUGUI clickLabel;
 
         [Header("Toggle")]
-        public TextMeshProUGUI toggleLabel;
+        [Tooltip("Label that shows ON/OFF state of the toggle button.")]
+        [SerializeField] private TextMeshProUGUI toggleLabel;
 
         [Header("Hold")]
-        public AdvancedUIButton holdButton;
-        public RectTransform    holdFill;
-        public float            holdFillWidth = 160f;
+        [Tooltip("The Hold button whose HoldConfig events are subscribed to at runtime.")]
+        [SerializeField] private AdvancedUIButton holdButton;
 
-        private static readonly Color OnColor  = new Color(0.29f, 0.84f, 0.44f);
+        [Tooltip("RectTransform of the progress bar fill image.")]
+        [SerializeField] private RectTransform holdFill;
+
+        [Tooltip("Full width of the progress bar in pixels, used to compute fill offsetMax.")]
+        [SerializeField] private float holdFillWidth = 160f;
+
+        private static readonly Color OnColor = new Color(0.29f, 0.84f, 0.44f);
         private static readonly Color OffColor = new Color(0.93f, 0.27f, 0.27f);
         private int _clicks;
 
         private void Start()
         {
-            // Toggle label initial state
             if (toggleLabel != null)
             {
-                toggleLabel.text  = "OFF";
+                toggleLabel.text = "OFF";
                 toggleLabel.color = OffColor;
             }
 
-            // Wire hold events at runtime via the public HoldConfig property
+            // Subscribe to hold events at runtime via the public HoldConfig property.
+            // This avoids UnityEvent<float> cross-assembly serialization issues.
             if (holdButton != null)
             {
                 holdButton.HoldConfig.OnHoldProgress.AddListener(OnHoldProgress);
@@ -46,26 +54,26 @@ namespace AdvancedUI.Demo
             }
         }
 
-        // Called by Standard button onClick (wired via SerializedObject)
+        /// <summary>Called by the Standard button onClick (wired via SerializedObject).</summary>
         public void OnClick()
         {
             _clicks++;
             if (clickLabel != null) clickLabel.text = "Clicks: " + _clicks;
         }
 
-        // Called by Toggle button _onSelected (wired via SerializedObject)
+        /// <summary>Called by the Toggle button _onSelected (wired via SerializedObject).</summary>
         public void OnToggleSelected()
         {
             if (toggleLabel == null) return;
-            toggleLabel.text  = "ON";
+            toggleLabel.text = "ON";
             toggleLabel.color = OnColor;
         }
 
-        // Called by Toggle button _onDeselected (wired via SerializedObject)
+        /// <summary>Called by the Toggle button _onDeselected (wired via SerializedObject).</summary>
         public void OnToggleDeselected()
         {
             if (toggleLabel == null) return;
-            toggleLabel.text  = "OFF";
+            toggleLabel.text = "OFF";
             toggleLabel.color = OffColor;
         }
 
@@ -81,6 +89,4 @@ namespace AdvancedUI.Demo
                 holdFill.offsetMax = Vector2.zero;
         }
     }
-
-
 }
