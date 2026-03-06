@@ -119,7 +119,7 @@ namespace AdvancedUI.Editor
             Rect rect = GUILayoutUtility.GetRect(0, 32, GUILayout.ExpandWidth(true));
             EditorGUI.DrawRect(rect, ColorStateBar);
 
-            GUI.Label(new Rect(rect.x + 8, rect.y + 4, rect.width * 0.55f, 22), "AdvancedUI  ?  Button", EditorStyles.boldLabel);
+            GUI.Label(new Rect(rect.x + 8, rect.y + 4, rect.width * 0.55f, 22), "AdvancedUI  --  Button", EditorStyles.boldLabel);
 
             if (Application.isPlaying)
                 GUI.Label(new Rect(rect.x + rect.width * 0.55f, rect.y + 4, rect.width * 0.45f - 8, 22),
@@ -213,7 +213,7 @@ namespace AdvancedUI.Editor
                         PasteColors(entry.FindPropertyRelative("_colors"));
                     GUI.enabled = true;
 
-                    if (GUILayout.Button(new GUIContent("?", "Remove this entry"), GUILayout.Width(22), GUILayout.Height(18)))
+                    if (GUILayout.Button(new GUIContent("X", "Remove this entry"), GUILayout.Width(22), GUILayout.Height(18)))
                     {
                         _animatorEntries.DeleteArrayElementAtIndex(i);
                         _entryFoldouts.RemoveAt(i);
@@ -254,7 +254,7 @@ namespace AdvancedUI.Editor
                     EditorGUILayout.Space(2);
                 }
 
-                if (GUILayout.Button("?  Add Graphic Entry"))
+                if (GUILayout.Button("+ Add Graphic Entry"))
                 {
                     _animatorEntries.arraySize++;
                     _entryFoldouts.Add(true);
@@ -332,7 +332,7 @@ namespace AdvancedUI.Editor
 
                     if (randPitch.boolValue)
                         EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_pitchVariance"), new GUIContent("Variance",
-                            "Max pitch offset in either direction (e.g. 0.1 -> pitch ? 0.1)."));
+                            "Max pitch offset in either direction (e.g. 0.1 -> pitch +/- 0.1)."));
                 }
             });
         }
@@ -433,7 +433,7 @@ namespace AdvancedUI.Editor
 
                     EditorGUILayout.Space(2);
 
-                    if (GUILayout.Button(new GUIContent("?  Auto Setup Ripple",
+                    if (GUILayout.Button(new GUIContent("[+] Auto Setup Ripple",
                         "Creates a child GameObject, adds UIButtonRipple, configures its RectTransform and assigns it automatically.")))
                     {
                         AutoSetupRipple();

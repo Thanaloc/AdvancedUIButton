@@ -72,10 +72,13 @@ namespace AdvancedUI
                     break;
 
                 case ButtonState.Selected:
-                    Play(previous == ButtonState.Selected ? _onDeselect : _onSelect);
+                    // next == Selected always means we just became selected.
+                    // Deselect sound is handled in the Normal case below.
+                    Play(_onSelect);
                     break;
 
                 case ButtonState.Normal:
+                    // Transitioning from Selected to Normal = deselection.
                     if (previous == ButtonState.Selected)
                         Play(_onDeselect);
                     break;
