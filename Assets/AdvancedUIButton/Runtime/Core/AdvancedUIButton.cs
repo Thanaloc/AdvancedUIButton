@@ -110,6 +110,12 @@ namespace AdvancedUI
         /// <summary>The active interaction mode.</summary>
         public InteractionMode Mode => _mode;
 
+        /// <summary>
+        /// Access to hold settings at runtime. Use to subscribe to
+        /// OnHoldProgress and OnHoldComplete from code.
+        /// </summary>
+        public HoldSettings HoldConfig => _holdSettings;
+
         // Private state
 
         private bool _isPointerOver;

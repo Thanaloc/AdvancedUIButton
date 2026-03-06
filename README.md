@@ -1,158 +1,198 @@
 # AdvancedUIButton
-> A professional, modular button system for Unity UI — built as an Asset Store release.
 
----
-
-## Overview
-
-`AdvancedUIButton` is a drop-in replacement for Unity's native `Button` component. It extends `UnityEngine.UI.Button` with a full state machine, animated transitions, audio feedback, toggle/radio/hold interaction modes, and a custom tabbed Inspector — all with zero external dependencies.
-
----
+A professional UI button system for Unity uGUI. Drop-in replacement for Unity's built-in Button with extended state machine, multi-graphic transitions, ripple effect, and ScriptableObject-based styling.
 
 ## Features
 
-- **7 button states** — Normal, Highlighted, Pressed, Selected, Selected+Highlighted, Focused, Disabled
-- **Multi-graphic entries** — colorize background, label, icon independently per state
-- **Animated transitions** — color and scale with 9 built-in easing functions
-- **4 interaction modes** — Standard, Toggle, Radio, Hold
-- **Toggle groups** — tab bars and radio buttons out of the box
-- **Audio module** — per-state clips with optional pitch randomization
-- **ScriptableObject styles** — one asset to style all buttons in a project
-- **C# events + UnityEvents** — both exposed for maximum flexibility
-- **Unscaled time support** — UI works correctly when the game is paused
-- **Zero external dependencies** — no DOTween, no third-party packages
-- **Unity 2021+ compatible**
-
----
-
-## Project Structure
-
-```
-AdvancedUIButton/
-├── Runtime/
-│   ├── Core/
-│   │   ├── AdvancedUIButton.cs       # Main component
-│   │   └── ButtonDefinitions.cs      # Enums, interfaces, shared types
-│   ├── Animation/
-│   │   ├── TweenRunner.cs            # Generic coroutine tween engine
-│   │   └── EasingFunctions.cs        # 9 easing functions, zero allocation
-│   ├── Modules/
-│   │   ├── UIButtonAnimator.cs       # Color + scale transitions
-│   │   └── UIButtonAudio.cs          # Audio feedback per state
-│   ├── Interaction/
-│   │   └── UIButtonToggleGroup.cs    # Radio/tab group management
-│   └── ScriptableObjects/
-│       └── UIButtonStyle.cs          # Style asset definition
-├── Editor/
-│   └── AdvancedUIButtonEditor.cs     # Custom tabbed Inspector
-├── Samples/                          # Demo scenes (coming)
-└── Documentation/                    # Full docs (coming)
-```
-
----
-
-## Installation
-
-1. Copy the `AdvancedUIButton/` folder into your Unity project under `Assets/`
-2. Unity will compile the scripts automatically
-3. Add `AdvancedUIButton` to any UI GameObject via `Add Component → AdvancedUI → Advanced UI Button`
-
-> The `Editor/` folder must remain named exactly `Editor` for Unity to exclude it from builds.
-
----
-
-## Quick Start
-
-### Basic button
-
-```csharp
-// Listen to events from code
-var btn = GetComponent<AdvancedUIButton>();
-
-btn.OnHoverEnterEvent     += () => Debug.Log("Hover in");
-btn.OnSelectionChangedEvent += isOn => Debug.Log($"Selected: {isOn}");
-btn.onClick.AddListener(() => Debug.Log("Clicked"));
-```
-
-### Toggle / Radio
-
-Set **Interaction Mode** to `Toggle` or `Radio` in the Inspector.  
-Assign a `UIButtonToggleGroup` to manage mutual exclusion across buttons.
-
-```csharp
-// Control selection from code
-btn.SetSelected(true);
-btn.ToggleSelection();
-```
-
-### Hold button
-
-Set **Interaction Mode** to `Hold` and configure **Hold Duration**.  
-Bind `OnHoldProgress` to drive a progress bar fill.
-
-```csharp
-btn.EditorHoldSettings.OnHoldProgress.AddListener(t => progressBar.fillAmount = t);
-btn.EditorHoldSettings.OnHoldComplete.AddListener(() => Debug.Log("Hold complete"));
-```
-
-### Applying a style at runtime
-
-```csharp
-[SerializeField] private UIButtonStyle _style;
-
-void Start()
-{
-    GetComponent<AdvancedUIButton>().ApplyStyle(_style);
-}
-```
-
----
-
-## States
-
-| State                | Triggered when                            |
-|----------------------|-------------------------------------------|
-| `Normal`             | Default                                   |
-| `Highlighted`        | Pointer over, interactable                |
-| `Pressed`            | Pointer down                              |
-| `Selected`           | Toggled on                                |
-| `SelectedHighlighted`| Toggled on + pointer over                 |
-| `Focused`            | Keyboard / gamepad navigation focus       |
-| `Disabled`           | `interactable = false`                    |
-
----
-
-## Easing Functions
-
-`Linear` · `EaseIn` · `EaseOut` · `EaseInOut` · `BackIn` · `BackOut` · `BackInOut` · `ElasticOut` · `BounceOut`
-
----
-
-## Roadmap
-
-- [x] Core state machine
-- [x] Multi-graphic color transitions
-- [x] Scale animation
-- [x] Audio module
-- [x] Toggle / Radio / Hold modes
-- [x] Toggle groups
-- [x] ScriptableObject styles
-- [x] Custom Inspector
-- [ ] Ripple effect
-- [ ] Built-in style presets (Primary, Secondary, Danger, Outline, Ghost)
-- [ ] Demo scenes
-- [ ] Full documentation
-
----
+- 7 button states: Normal, Highlighted, Pressed, Selected, Focused, SelectedHighlighted, Disabled
+- Multi-graphic support: animate Background, Label, Icon independently with per-graphic duration and easing
+- 9 easing functions: Linear, EaseIn/Out/InOut, BackOut, ElasticOut, BounceOut, and more
+- Scale animation on the button RectTransform
+- Ripple effect with dynamic size calculation and pool-based zero-allocation spawning
+- 4 interaction modes: Standard, Toggle, Radio, Hold
+- UIButtonToggleGroup for mutual exclusion between Radio buttons
+- ScriptableObject styles: define once, apply anywhere, update globally
+- 5 built-in presets: Primary, Secondary, Danger, Outline, Ghost
+- Full audio support with pitch randomization
+- ignoreTimeScale support for pause-safe UI
+- Custom Inspector with tabbed layout, tooltips, and one-click ripple setup
+- Assembly Definition files for clean compilation isolation
+- Unity 6 / URP / HDRP / Built-in compatible
 
 ## Requirements
 
-- Unity 2021.3 LTS or newer
-- Unity UI package (com.unity.ugui)
+- Unity 2022.3 LTS or later (Unity 6 recommended)
+- TextMeshPro
+- No other dependencies
 
----
+## Installation
 
-## License
+1. Import the package into your project
+2. Add `AdvancedUI/Advanced UI Button` to any GameObject via Add Component
+3. Add your Graphic components (Image for background, TextMeshPro for label)
+4. Assign them in the Graphics tab of the Inspector
 
-Private — all rights reserved.  
-Not for redistribution prior to Asset Store release.
+## Quick Start
+
+### Creating a button
+
+```
+1. Create a UI GameObject (right-click Hierarchy -> UI -> Empty)
+2. Add Component -> AdvancedUI -> Advanced UI Button
+3. Add a child Image (Background) and a child TextMeshProUGUI (Label)
+4. In the Graphics tab, add two entries:
+   - Entry 0: target = Background Image, role = Background
+   - Entry 1: target = Label TMP, role = Label
+5. Assign a style in the Style tab or configure colors manually
+```
+
+### Applying a style
+
+```csharp
+// From code
+AdvancedUIButton btn = GetComponent<AdvancedUIButton>();
+btn.ApplyStyle(UIButtonStylePresets.Primary());
+
+// Or assign a .asset file in the Inspector Style tab
+```
+
+### Generating built-in style presets
+
+```
+Tools -> AdvancedUI -> Generate Style Presets
+```
+
+This creates 5 .asset files in `Assets/AdvancedUIButton/Presets/`.
+
+### Generating the demo scene
+
+```
+Tools -> AdvancedUI -> Create Demo Scene
+```
+
+## API Reference
+
+### AdvancedUIButton
+
+| Member | Description |
+|---|---|
+| `CurrentState` | The current ButtonState |
+| `IsToggleOn` | True when the button is in Selected state |
+| `Mode` | The active InteractionMode |
+| `HoldConfig` | Access to hold settings and events at runtime |
+| `ApplyStyle(UIButtonStyle)` | Applies a style asset |
+| `SetSelected(bool)` | Sets the toggle selection state |
+| `ToggleSelection()` | Flips the current selection state |
+| `SetInteractable(bool)` | Enables or disables the button |
+| `ForceRefresh()` | Forces an immediate visual refresh |
+
+### Events (Inspector)
+
+| Event | When |
+|---|---|
+| `OnHoverEnter` | Pointer enters the button |
+| `OnHoverExit` | Pointer exits the button |
+| `OnPress` | Button is pressed down |
+| `OnRelease` | Button is released |
+| `OnSelected` | Button becomes selected |
+| `OnDeselected` | Button becomes deselected |
+| `OnHoldComplete` | Hold duration fully elapsed |
+
+### Events (C#)
+
+```csharp
+btn.OnHoverEnterEvent      += () => { };
+btn.OnHoverExitEvent       += () => { };
+btn.OnPressEvent           += () => { };
+btn.OnReleaseEvent         += () => { };
+btn.OnSelectionChangedEvent += isOn => { };
+```
+
+### UIButtonToggleGroup
+
+| Member | Description |
+|---|---|
+| `Current` | The currently selected button |
+| `SelectButton(btn)` | Selects a specific button |
+| `SelectIndex(int)` | Selects by index |
+| `DeselectAll()` | Clears selection (requires AllowNone) |
+| `Register(btn)` | Adds a button at runtime |
+| `Unregister(btn)` | Removes a button at runtime |
+
+### UIButtonRipple
+
+| Member | Description |
+|---|---|
+| `Spawn(Vector2)` | Spawns a ripple at screen position |
+| `ApplyStyle(UIButtonStyle)` | Syncs color from style (if SyncWithStyle enabled) |
+
+## Interaction Modes
+
+| Mode | Behavior |
+|---|---|
+| Standard | Normal click button |
+| Toggle | Click to select, click again to deselect |
+| Radio | Click to select, cannot deselect alone -- use with UIButtonToggleGroup |
+| Hold | Must hold for full duration to trigger OnHoldComplete |
+
+## Style System
+
+Styles are `UIButtonStyle` ScriptableObjects. Each style defines:
+- Background colors per state
+- Label colors per state
+- Icon colors per state
+- Animation settings (duration, easing, scale values)
+- Audio clips
+
+A style is applied once and updates all registered graphic entries that have a matching role (Background, Label, Icon). Custom role entries are never overwritten.
+
+## Assembly Definitions
+
+| Assembly | Contents |
+|---|---|
+| `AdvancedUI.Runtime` | All runtime scripts |
+| `AdvancedUI.Editor` | Custom Inspector, scene builder, preset generator |
+| `AdvancedUI.Demo` | Demo scene helpers (not required in production) |
+
+## File Structure
+
+```
+Assets/AdvancedUIButton/
+├── Runtime/
+│   ├── Core/
+│   │   ├── AdvancedUIButton.cs
+│   │   └── ButtonDefinitions.cs
+│   ├── Modules/
+│   │   ├── UIButtonAnimator.cs
+│   │   ├── UIButtonAudio.cs
+│   │   └── UIButtonRipple.cs
+│   ├── Animation/
+│   │   ├── TweenRunner.cs
+│   │   └── EasingFunctions.cs
+│   ├── Interaction/
+│   │   └── UIButtonToggleGroup.cs
+│   ├── ScriptableObjects/
+│   │   ├── UIButtonStyle.cs
+│   │   └── UIButtonStylePresets.cs
+│   └── AdvancedUI.Runtime.asmdef
+├── Editor/
+│   ├── AdvancedUIButtonEditor.cs
+│   ├── UIButtonStylePresetsGenerator.cs
+│   ├── DemoSceneBuilder.cs
+│   └── AdvancedUI.Editor.asmdef
+├── Demo/
+│   ├── DemoHelpers.cs
+│   ├── AdvancedUI.Demo.asmdef
+│   └── AdvancedUIButton_Demo.unity
+└── Presets/
+    ├── Style_Primary.asset
+    ├── Style_Secondary.asset
+    ├── Style_Danger.asset
+    ├── Style_Outline.asset
+    └── Style_Ghost.asset
+```
+
+## Changelog
+
+### 1.0.0
+- Initial release

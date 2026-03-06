@@ -50,7 +50,7 @@ namespace AdvancedUI.Editor
             var scaler = canvasGO.AddComponent<CanvasScaler>();
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(CW, CH);
-            scaler.matchWidthOrHeight = 0.5f;
+            scaler.matchWidthOrHeight = 0f;
             canvasGO.AddComponent<GraphicRaycaster>();
 
             // Background panel
@@ -171,16 +171,12 @@ namespace AdvancedUI.Editor
             fillRT.offsetMin = Vector2.zero; fillRT.offsetMax = Vector2.zero;
             fillGO.AddComponent<Image>().color = Hex("EF4444");
 
+            // Wire hold references on DemoController -- events subscribed at runtime via HoldConfig
             var hso = new SerializedObject(ctrl);
+            hso.FindProperty("holdButton").objectReferenceValue = holdBtn.GetComponent<AdvancedUIButton>();
             hso.FindProperty("holdFill").objectReferenceValue = fillRT;
             hso.FindProperty("holdFillWidth").floatValue = BW;
             hso.ApplyModifiedProperties();
-
-            var holdSO = new SerializedObject(holdBtn.GetComponent<AdvancedUIButton>());
-            var holdSet = holdSO.FindProperty("_holdSettings");
-            WireFloat(holdSet.FindPropertyRelative("_onHoldProgress"), ctrl, "OnHoldProgress");
-            WireVoid(holdSet.FindPropertyRelative("_onHoldComplete"), ctrl, "OnHoldComplete");
-            holdSO.ApplyModifiedProperties();
             Lbl(c, "Hold (1s)", hx, BH * 0.5f + 16, BW, 20, 11, CCap);
         }
 
@@ -196,14 +192,45 @@ namespace AdvancedUI.Editor
                 float x = x0 + i * (BW + BG);
                 var btn = Btn(c, "State_" + states[i], states[i], x, 8, BW, BH, prim);
                 var adv = btn.GetComponent<AdvancedUIButton>();
-                var bg = btn.transform.Find("Background").GetComponent<Image>();
+                var bgImg = btn.transform.Find("Background").GetComponent<Image>();
+                var lblTmp = btn.transform.Find("Label").GetComponent<TextMeshProUGUI>();
+
                 switch (states[i])
                 {
-                    case "Disabled": adv.SetInteractable(false); break;
-                    case "Selected": adv.SetSelected(true); break;
-                    case "Hover": bg.color = prim.background.colors.highlighted; break;
-                    case "Pressed": bg.color = prim.background.colors.pressed; break;
-                    case "Focused": bg.color = prim.background.colors.focused; break;
+                    case "Normal":
+                        // Leave fully interactive -- visitor can hover to see transitions
+                        break;
+
+                    case "Disabled":
+                        adv.SetInteractable(false);
+                        break;
+
+                    case "Selected":
+                        adv.SetSelected(true);
+                        break;
+
+                    default:
+                        {
+                            // Freeze in target state: disable AdvancedUIButton so no
+                            // state machine runs, then set colors directly on the Graphics.
+                            // No extra component needed -- nothing to serialize, nothing to break.
+                            adv.enabled = false;
+                            bgImg.color = states[i] switch
+                            {
+                                "Hover" => prim.background.colors.highlighted,
+                                "Pressed" => prim.background.colors.pressed,
+                                "Focused" => prim.background.colors.focused,
+                                _ => prim.background.colors.normal
+                            };
+                            lblTmp.color = states[i] switch
+                            {
+                                "Hover" => prim.label.colors.highlighted,
+                                "Pressed" => prim.label.colors.pressed,
+                                "Focused" => prim.label.colors.focused,
+                                _ => prim.label.colors.normal
+                            };
+                            break;
+                        }
                 }
                 Lbl(c, states[i], x, -BH * 0.5f - 16, BW, 22, 12, CCap);
             }
@@ -375,9 +402,12 @@ namespace AdvancedUI.Editor
             int i = calls.arraySize++;
             var call = calls.GetArrayElementAtIndex(i);
             call.FindPropertyRelative("m_Target").objectReferenceValue = target;
+            call.FindPropertyRelative("m_TargetAssemblyTypeName").stringValue =
+                target.GetType().AssemblyQualifiedName;
             call.FindPropertyRelative("m_MethodName").stringValue = method;
             call.FindPropertyRelative("m_Mode").enumValueIndex = 1; // Void
             call.FindPropertyRelative("m_CallState").enumValueIndex = 2; // RuntimeOnly
+            call.FindPropertyRelative("m_Arguments.m_ObjectArgumentAssemblyTypeName").stringValue = "UnityEngine.Object, UnityEngine";
         }
 
         static void WireFloat(SerializedProperty evt, Object target, string method)
@@ -386,9 +416,14 @@ namespace AdvancedUI.Editor
             int i = calls.arraySize++;
             var call = calls.GetArrayElementAtIndex(i);
             call.FindPropertyRelative("m_Target").objectReferenceValue = target;
+            call.FindPropertyRelative("m_TargetAssemblyTypeName").stringValue =
+                target.GetType().AssemblyQualifiedName;
             call.FindPropertyRelative("m_MethodName").stringValue = method;
             call.FindPropertyRelative("m_Mode").enumValueIndex = 5; // Float
             call.FindPropertyRelative("m_CallState").enumValueIndex = 2; // RuntimeOnly
+            // Float argument must be initialized even if value is 0
+            call.FindPropertyRelative("m_Arguments.m_FloatArgument").floatValue = 0f;
+            call.FindPropertyRelative("m_Arguments.m_ObjectArgumentAssemblyTypeName").stringValue = "UnityEngine.Object, UnityEngine";
         }
 
         static UIButtonStyle Preset(string name)

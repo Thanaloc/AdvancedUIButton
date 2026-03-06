@@ -3,16 +3,27 @@
 
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 namespace AdvancedUI.Demo
 {
+    /// <summary>
+    /// Central controller for the demo scene.
+    /// Holds references to all interactive labels and wires hold events at runtime.
+    /// </summary>
     [AddComponentMenu("AdvancedUI/Demo/Demo Controller")]
     public sealed class DemoController : MonoBehaviour
     {
-        [SerializeField] public TextMeshProUGUI clickLabel;
-        [SerializeField] public TextMeshProUGUI toggleLabel;
-        [SerializeField] public RectTransform holdFill;
-        [SerializeField] public float holdFillWidth = 160f;
+        [Header("Standard")]
+        public TextMeshProUGUI clickLabel;
+
+        [Header("Toggle")]
+        public TextMeshProUGUI toggleLabel;
+
+        [Header("Hold")]
+        public AdvancedUIButton holdButton;
+        public RectTransform holdFill;
+        public float holdFillWidth = 160f;
 
         private static readonly Color OnColor = new Color(0.29f, 0.84f, 0.44f);
         private static readonly Color OffColor = new Color(0.93f, 0.27f, 0.27f);
@@ -20,15 +31,29 @@ namespace AdvancedUI.Demo
 
         private void Start()
         {
-            if (toggleLabel != null) { toggleLabel.text = "OFF"; toggleLabel.color = OffColor; }
+            // Toggle label initial state
+            if (toggleLabel != null)
+            {
+                toggleLabel.text = "OFF";
+                toggleLabel.color = OffColor;
+            }
+
+            // Wire hold events at runtime via the public HoldConfig property
+            if (holdButton != null)
+            {
+                holdButton.HoldConfig.OnHoldProgress.AddListener(OnHoldProgress);
+                holdButton.HoldConfig.OnHoldComplete.AddListener(OnHoldComplete);
+            }
         }
 
+        // Called by Standard button onClick (wired via SerializedObject)
         public void OnClick()
         {
             _clicks++;
             if (clickLabel != null) clickLabel.text = "Clicks: " + _clicks;
         }
 
+        // Called by Toggle button _onSelected (wired via SerializedObject)
         public void OnToggleSelected()
         {
             if (toggleLabel == null) return;
@@ -36,6 +61,7 @@ namespace AdvancedUI.Demo
             toggleLabel.color = OnColor;
         }
 
+        // Called by Toggle button _onDeselected (wired via SerializedObject)
         public void OnToggleDeselected()
         {
             if (toggleLabel == null) return;
@@ -43,16 +69,18 @@ namespace AdvancedUI.Demo
             toggleLabel.color = OffColor;
         }
 
-        public void OnHoldProgress(float t)
+        private void OnHoldProgress(float t)
         {
             if (holdFill != null)
                 holdFill.offsetMax = new Vector2(holdFillWidth * t, 0f);
         }
 
-        public void OnHoldComplete()
+        private void OnHoldComplete()
         {
             if (holdFill != null)
                 holdFill.offsetMax = Vector2.zero;
         }
     }
+
+
 }

@@ -14,43 +14,43 @@ MonoBehaviour:
   m_EditorClassIdentifier: AdvancedUI.Runtime::AdvancedUI.UIButtonStyle
   background:
     colors:
-      normal: {r: 0.29411766, g: 0.33333334, b: 0.3882353, a: 1}
-      highlighted: {r: 0.21568628, g: 0.25490198, b: 0.31764707, a: 1}
-      pressed: {r: 0.12156863, g: 0.16078432, b: 0.21568628, a: 1}
-      selected: {r: 0.12156863, g: 0.16078432, b: 0.21568628, a: 1}
-      selectedHighlighted: {r: 0.06666667, g: 0.09411765, b: 0.15294118, a: 1}
-      focused: {r: 0.41960785, g: 0.44705883, b: 0.5019608, a: 1}
-      disabled: {r: 0.6117647, g: 0.6392157, b: 0.6862745, a: 0.5}
+      normal: {r: 0.2, g: 0.25490198, b: 0.33333334, a: 1}
+      highlighted: {r: 0.2784314, g: 0.33333334, b: 0.4117647, a: 1}
+      pressed: {r: 0.11764706, g: 0.16078432, b: 0.23137255, a: 1}
+      selected: {r: 0.05882353, g: 0.09019608, b: 0.16470589, a: 1}
+      selectedHighlighted: {r: 0.11764706, g: 0.16078432, b: 0.23137255, a: 1}
+      focused: {r: 0.39215687, g: 0.45490196, b: 0.54509807, a: 1}
+      disabled: {r: 0.11764706, g: 0.16078432, b: 0.23137255, a: 0.7}
   label:
     colors:
-      normal: {r: 1, g: 1, b: 1, a: 1}
+      normal: {r: 0.8862745, g: 0.9098039, b: 0.9411765, a: 1}
       highlighted: {r: 1, g: 1, b: 1, a: 1}
-      pressed: {r: 1, g: 1, b: 1, a: 0.9}
-      selected: {r: 1, g: 1, b: 1, a: 1}
-      selectedHighlighted: {r: 1, g: 1, b: 1, a: 1}
+      pressed: {r: 0.5803922, g: 0.6392157, b: 0.72156864, a: 1}
+      selected: {r: 0.5803922, g: 0.6392157, b: 0.72156864, a: 1}
+      selectedHighlighted: {r: 0.39215687, g: 0.45490196, b: 0.54509807, a: 1}
       focused: {r: 1, g: 1, b: 1, a: 1}
-      disabled: {r: 1, g: 1, b: 1, a: 0.5}
+      disabled: {r: 0.2784314, g: 0.33333334, b: 0.4117647, a: 1}
   icon:
     colors:
-      normal: {r: 1, g: 1, b: 1, a: 1}
+      normal: {r: 0.8862745, g: 0.9098039, b: 0.9411765, a: 1}
       highlighted: {r: 1, g: 1, b: 1, a: 1}
-      pressed: {r: 1, g: 1, b: 1, a: 0.9}
-      selected: {r: 1, g: 1, b: 1, a: 1}
-      selectedHighlighted: {r: 1, g: 1, b: 1, a: 1}
+      pressed: {r: 0.5803922, g: 0.6392157, b: 0.72156864, a: 1}
+      selected: {r: 0.5803922, g: 0.6392157, b: 0.72156864, a: 1}
+      selectedHighlighted: {r: 0.39215687, g: 0.45490196, b: 0.54509807, a: 1}
       focused: {r: 1, g: 1, b: 1, a: 1}
-      disabled: {r: 1, g: 1, b: 1, a: 0.5}
+      disabled: {r: 0.2784314, g: 0.33333334, b: 0.4117647, a: 1}
   animation:
     enableScale: 1
     transform:
       normalScale: {x: 1, y: 1, z: 1}
-      highlightedScale: {x: 1.04, y: 1.04, z: 1}
-      pressedScale: {x: 0.96, y: 0.96, z: 1}
+      highlightedScale: {x: 1.05, y: 1.05, z: 1}
+      pressedScale: {x: 0.95, y: 0.95, z: 1}
       selectedScale: {x: 1, y: 1, z: 1}
-      focusedScale: {x: 1.02, y: 1.02, z: 1}
+      focusedScale: {x: 1.03, y: 1.03, z: 1}
       disabledScale: {x: 1, y: 1, z: 1}
-    scaleDuration: 0.12
+    scaleDuration: 0.14
     scaleEasing: 5
-    colorDuration: 0.1
+    colorDuration: 0.12
     colorEasing: 2
     ignoreTimeScale: 1
   audio:
