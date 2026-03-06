@@ -1,3 +1,6 @@
+// AdvancedUIButton -- Advanced UI Button System for Unity
+// Copyright (c) 2025 AdvancedUI. All rights reserved.
+
 #if UNITY_EDITOR
 using System.IO;
 using UnityEditor;
@@ -7,7 +10,7 @@ namespace AdvancedUI.Editor
 {
     /// <summary>
     /// Generates the 5 built-in style preset .asset files in the project.
-    /// Access via Tools → AdvancedUI → Generate Style Presets.
+    /// Access via Tools -> AdvancedUI -> Generate Style Presets.
     /// </summary>
     public static class UIButtonStylePresetsGenerator
     {
@@ -16,15 +19,7 @@ namespace AdvancedUI.Editor
         [MenuItem("Tools/AdvancedUI/Generate Style Presets", priority = 1)]
         public static void GenerateAll()
         {
-            EnsureDirectory(OutputPath);
-
-            CreateAsset(UIButtonStylePresets.Primary(),   "Style_Primary");
-            CreateAsset(UIButtonStylePresets.Secondary(), "Style_Secondary");
-            CreateAsset(UIButtonStylePresets.Danger(),    "Style_Danger");
-            CreateAsset(UIButtonStylePresets.Outline(),   "Style_Outline");
-            CreateAsset(UIButtonStylePresets.Ghost(),     "Style_Ghost");
-
-            AssetDatabase.SaveAssets();
+            GenerateSilent();
             AssetDatabase.Refresh();
 
             EditorUtility.DisplayDialog(
@@ -33,9 +28,23 @@ namespace AdvancedUI.Editor
                 "OK"
             );
 
-            // Ping the folder in the Project panel
             Object folder = AssetDatabase.LoadAssetAtPath<Object>(OutputPath);
             if (folder != null) EditorGUIUtility.PingObject(folder);
+        }
+
+        /// <summary>
+        /// Generates presets without showing a dialog or calling Refresh.
+        /// Safe to call from other editor scripts mid-operation.
+        /// </summary>
+        public static void GenerateSilent()
+        {
+            EnsureDirectory(OutputPath);
+            CreateAsset(UIButtonStylePresets.Primary(), "Style_Primary");
+            CreateAsset(UIButtonStylePresets.Secondary(), "Style_Secondary");
+            CreateAsset(UIButtonStylePresets.Danger(), "Style_Danger");
+            CreateAsset(UIButtonStylePresets.Outline(), "Style_Outline");
+            CreateAsset(UIButtonStylePresets.Ghost(), "Style_Ghost");
+            AssetDatabase.SaveAssets();
         }
 
         private static void CreateAsset(UIButtonStyle style, string assetName)

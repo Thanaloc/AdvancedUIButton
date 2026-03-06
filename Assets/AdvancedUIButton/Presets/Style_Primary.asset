@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8568909c184a6d468db4a3292ab6659, type: 3}
   m_Name: Style_Primary
-  m_EditorClassIdentifier: Assembly-CSharp::AdvancedUI.UIButtonStyle
+  m_EditorClassIdentifier: AdvancedUI.Runtime::AdvancedUI.UIButtonStyle
   background:
     colors:
       normal: {r: 0.14509805, g: 0.3882353, b: 0.92156863, a: 1}

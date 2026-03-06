@@ -1,20 +1,16 @@
 {
-    "name": "AdvancedUI.Editor",
-    "rootNamespace": "AdvancedUI.Editor",
+    "name": "AdvancedUI.Demo",
+    "rootNamespace": "AdvancedUI.Demo",
     "references": [
         "AdvancedUI.Runtime",
-        "AdvancedUI.Demo",
-        "Unity.TextMeshPro",
-        "UnityEditor.UI"
+        "Unity.TextMeshPro"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,
     "precompiledReferences": [],
-    "autoReferenced": false,
+    "autoReferenced": true,
     "defineConstraints": [],
     "versionDefines": [],
     "noEngineReferences": false
