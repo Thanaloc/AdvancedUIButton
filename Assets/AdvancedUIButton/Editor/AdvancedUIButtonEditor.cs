@@ -1,3 +1,6 @@
+// AdvancedUIButton Advanced UI Button System for Unity
+// Copyright (c) 2025 AdvancedUI. All rights reserved.
+
 #if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEditor;
@@ -69,8 +72,8 @@ namespace AdvancedUI.Editor
 
             _style = serializedObject.FindProperty("_style");
             _animator = serializedObject.FindProperty("_animator");
-            _animatorEntries = _animator.FindPropertyRelative("graphicEntries");
-            _animatorTransform = _animator.FindPropertyRelative("transformSettings");
+            _animatorEntries = _animator.FindPropertyRelative("_graphicEntries");
+            _animatorTransform = _animator.FindPropertyRelative("_transformSettings");
             _audio = serializedObject.FindProperty("_audio");
             _mode = serializedObject.FindProperty("_mode");
             _holdSettings = serializedObject.FindProperty("_holdSettings");
@@ -116,7 +119,7 @@ namespace AdvancedUI.Editor
             Rect rect = GUILayoutUtility.GetRect(0, 32, GUILayout.ExpandWidth(true));
             EditorGUI.DrawRect(rect, ColorStateBar);
 
-            GUI.Label(new Rect(rect.x + 8, rect.y + 4, rect.width * 0.55f, 22), "AdvancedUI  —  Button", EditorStyles.boldLabel);
+            GUI.Label(new Rect(rect.x + 8, rect.y + 4, rect.width * 0.55f, 22), "AdvancedUI  ?  Button", EditorStyles.boldLabel);
 
             if (Application.isPlaying)
                 GUI.Label(new Rect(rect.x + rect.width * 0.55f, rect.y + 4, rect.width * 0.45f - 8, 22),
@@ -144,7 +147,7 @@ namespace AdvancedUI.Editor
             EditorGUILayout.EndHorizontal();
         }
 
-        // ─── STYLE ───────────────────────────────────────────────────────────
+        // STYLE
 
         private void DrawStyleTab()
         {
@@ -170,7 +173,7 @@ namespace AdvancedUI.Editor
             });
         }
 
-        // ─── GRAPHICS ────────────────────────────────────────────────────────
+        // GRAPHICS
 
         private void DrawGraphicsTab()
         {
@@ -189,8 +192,8 @@ namespace AdvancedUI.Editor
                 for (int i = 0; i < _animatorEntries.arraySize; i++)
                 {
                     SerializedProperty entry = _animatorEntries.GetArrayElementAtIndex(i);
-                    SerializedProperty tgt = entry.FindPropertyRelative("target");
-                    SerializedProperty role = entry.FindPropertyRelative("role");
+                    SerializedProperty tgt = entry.FindPropertyRelative("_target");
+                    SerializedProperty role = entry.FindPropertyRelative("_role");
 
                     string label = tgt.objectReferenceValue != null
                         ? $"{tgt.objectReferenceValue.name}  [{(GraphicRole)role.enumValueIndex}]"
@@ -198,19 +201,19 @@ namespace AdvancedUI.Editor
 
                     EditorGUILayout.BeginVertical(EditorStyles.helpBox);
 
-                    // ── header row ──
+                    // header row
                     EditorGUILayout.BeginHorizontal();
                     _entryFoldouts[i] = EditorGUILayout.Foldout(_entryFoldouts[i], label, true, EditorStyles.foldoutHeader);
 
                     if (GUILayout.Button(new GUIContent("C", "Copy colors from this entry"), GUILayout.Width(22), GUILayout.Height(18)))
-                        CopyColors(entry.FindPropertyRelative("colors"));
+                        CopyColors(entry.FindPropertyRelative("_colors"));
 
                     GUI.enabled = _copiedColors != null;
                     if (GUILayout.Button(new GUIContent("P", "Paste copied colors into this entry"), GUILayout.Width(22), GUILayout.Height(18)))
-                        PasteColors(entry.FindPropertyRelative("colors"));
+                        PasteColors(entry.FindPropertyRelative("_colors"));
                     GUI.enabled = true;
 
-                    if (GUILayout.Button(new GUIContent("✕", "Remove this entry"), GUILayout.Width(22), GUILayout.Height(18)))
+                    if (GUILayout.Button(new GUIContent("?", "Remove this entry"), GUILayout.Width(22), GUILayout.Height(18)))
                     {
                         _animatorEntries.DeleteArrayElementAtIndex(i);
                         _entryFoldouts.RemoveAt(i);
@@ -231,18 +234,18 @@ namespace AdvancedUI.Editor
                             "Background / Label / Icon entries receive their colors from the Style asset when Apply Style is clicked. Custom entries are never overwritten."));
 
                         EditorGUILayout.Space(4);
-                        DrawStateColorsCompact(entry.FindPropertyRelative("colors"));
+                        DrawStateColorsCompact(entry.FindPropertyRelative("_colors"));
 
                         EditorGUILayout.Space(4);
                         EditorGUILayout.BeginHorizontal();
-                        EditorGUILayout.PropertyField(entry.FindPropertyRelative("duration"), new GUIContent("Duration",
+                        EditorGUILayout.PropertyField(entry.FindPropertyRelative("_duration"), new GUIContent("Duration",
                             "Color transition duration in seconds. Set to 0 for instant."));
-                        EditorGUILayout.PropertyField(entry.FindPropertyRelative("easing"), new GUIContent("Easing",
+                        EditorGUILayout.PropertyField(entry.FindPropertyRelative("_easing"), new GUIContent("Easing",
                             "Easing function used for the color transition."));
                         EditorGUILayout.EndHorizontal();
 
                         if (GUILayout.Button(new GUIContent("Reset Colors to Default", "Resets all state colors to the built-in defaults.")))
-                            ResetColors(entry.FindPropertyRelative("colors"));
+                            ResetColors(entry.FindPropertyRelative("_colors"));
 
                         EditorGUI.indentLevel--;
                     }
@@ -251,7 +254,7 @@ namespace AdvancedUI.Editor
                     EditorGUILayout.Space(2);
                 }
 
-                if (GUILayout.Button("＋  Add Graphic Entry"))
+                if (GUILayout.Button("?  Add Graphic Entry"))
                 {
                     _animatorEntries.arraySize++;
                     _entryFoldouts.Add(true);
@@ -259,20 +262,20 @@ namespace AdvancedUI.Editor
             });
         }
 
-        // ─── TRANSFORM ───────────────────────────────────────────────────────
+        // TRANSFORM
 
         private void DrawTransformTab()
         {
             DrawSection("Scale Animation", ColorTransform, () =>
             {
-                SerializedProperty enabled = _animatorTransform.FindPropertyRelative("enabled");
+                SerializedProperty enabled = _animatorTransform.FindPropertyRelative("_enabled");
                 EditorGUILayout.PropertyField(enabled, new GUIContent("Enabled",
                     "Animates the RectTransform localScale on state changes."));
 
                 if (enabled.boolValue)
                 {
                     EditorGUILayout.Space(4);
-                    SerializedProperty states = _animatorTransform.FindPropertyRelative("states");
+                    SerializedProperty states = _animatorTransform.FindPropertyRelative("_states");
 
                     DrawScaleRow("Normal", states.FindPropertyRelative("normalScale"));
                     DrawScaleRow("Hover", states.FindPropertyRelative("highlightedScale"));
@@ -283,58 +286,58 @@ namespace AdvancedUI.Editor
 
                     EditorGUILayout.Space(4);
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.PropertyField(_animatorTransform.FindPropertyRelative("duration"), new GUIContent("Duration",
+                    EditorGUILayout.PropertyField(_animatorTransform.FindPropertyRelative("_duration"), new GUIContent("Duration",
                         "Scale transition duration in seconds."));
-                    EditorGUILayout.PropertyField(_animatorTransform.FindPropertyRelative("easing"), new GUIContent("Easing",
+                    EditorGUILayout.PropertyField(_animatorTransform.FindPropertyRelative("_easing"), new GUIContent("Easing",
                         "Easing function used for the scale transition. BackOut gives a nice springy feel."));
                     EditorGUILayout.EndHorizontal();
                 }
             });
         }
 
-        // ─── AUDIO ───────────────────────────────────────────────────────────
+        // AUDIO
 
         private void DrawAudioTab()
         {
             DrawSection("Audio", ColorAudio, () =>
             {
-                SerializedProperty enabled = _audio.FindPropertyRelative("enabled");
+                SerializedProperty enabled = _audio.FindPropertyRelative("_enabled");
                 EditorGUILayout.PropertyField(enabled, new GUIContent("Enabled",
                     "Enable audio feedback on state changes."));
 
                 if (enabled.boolValue)
                 {
-                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("source"), new GUIContent("Audio Source",
+                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_source"), new GUIContent("Audio Source",
                         "The AudioSource used to play button sounds. Place it on a persistent GameObject."));
 
                     EditorGUILayout.Space(4);
                     EditorGUILayout.LabelField("Clips", EditorStyles.boldLabel);
-                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("onHoverEnter"), new GUIContent("Hover Enter"));
-                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("onPress"), new GUIContent("Press"));
-                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("onSelect"), new GUIContent("Select"));
-                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("onDeselect"), new GUIContent("Deselect"));
-                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("onDisabled"), new GUIContent("Disabled"));
+                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_onHoverEnter"), new GUIContent("Hover Enter"));
+                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_onPress"), new GUIContent("Press"));
+                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_onSelect"), new GUIContent("Select"));
+                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_onDeselect"), new GUIContent("Deselect"));
+                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_onDisabled"), new GUIContent("Disabled"));
 
                     EditorGUILayout.Space(4);
                     EditorGUILayout.LabelField("Settings", EditorStyles.boldLabel);
 
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("volume"), new GUIContent("Volume"));
-                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("pitch"), new GUIContent("Pitch"));
+                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_volume"), new GUIContent("Volume"));
+                    EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_pitch"), new GUIContent("Pitch"));
                     EditorGUILayout.EndHorizontal();
 
-                    SerializedProperty randPitch = _audio.FindPropertyRelative("randomizePitch");
+                    SerializedProperty randPitch = _audio.FindPropertyRelative("_randomizePitch");
                     EditorGUILayout.PropertyField(randPitch, new GUIContent("Randomize Pitch",
                         "Adds a small random offset to the pitch on each play to avoid repetition."));
 
                     if (randPitch.boolValue)
-                        EditorGUILayout.PropertyField(_audio.FindPropertyRelative("pitchVariance"), new GUIContent("Variance",
-                            "Max pitch offset in either direction (e.g. 0.1 → pitch ± 0.1)."));
+                        EditorGUILayout.PropertyField(_audio.FindPropertyRelative("_pitchVariance"), new GUIContent("Variance",
+                            "Max pitch offset in either direction (e.g. 0.1 -> pitch ? 0.1)."));
                 }
             });
         }
 
-        // ─── INTERACTION ─────────────────────────────────────────────────────
+        // INTERACTION
 
         private void DrawInteractionTab()
         {
@@ -358,14 +361,14 @@ namespace AdvancedUI.Editor
                     EditorGUILayout.Space(4);
                     EditorGUILayout.LabelField("Hold Settings", EditorStyles.boldLabel);
 
-                    EditorGUILayout.PropertyField(_holdSettings.FindPropertyRelative("duration"), new GUIContent("Hold Duration",
+                    EditorGUILayout.PropertyField(_holdSettings.FindPropertyRelative("_duration"), new GUIContent("Hold Duration",
                         "How long in seconds the user must hold the button to trigger OnHoldComplete."));
-                    EditorGUILayout.PropertyField(_holdSettings.FindPropertyRelative("cancelOnExit"), new GUIContent("Cancel On Exit",
+                    EditorGUILayout.PropertyField(_holdSettings.FindPropertyRelative("_cancelOnExit"), new GUIContent("Cancel On Exit",
                         "If enabled, moving the pointer outside the button cancels the hold."));
 
                     EditorGUILayout.Space(2);
-                    EditorGUILayout.PropertyField(_holdSettings.FindPropertyRelative("OnHoldComplete"), new GUIContent("On Hold Complete"));
-                    EditorGUILayout.PropertyField(_holdSettings.FindPropertyRelative("OnHoldProgress"), new GUIContent("On Hold Progress",
+                    EditorGUILayout.PropertyField(_holdSettings.FindPropertyRelative("_onHoldComplete"), new GUIContent("On Hold Complete"));
+                    EditorGUILayout.PropertyField(_holdSettings.FindPropertyRelative("_onHoldProgress"), new GUIContent("On Hold Progress",
                         "Fires every frame with a 0-1 progress value. Use it to drive a progress bar fill."));
                 }
 
@@ -383,7 +386,7 @@ namespace AdvancedUI.Editor
             });
         }
 
-        // ─── EVENTS ──────────────────────────────────────────────────────────
+        // EVENTS
 
         private void DrawEventsTab()
         {
@@ -412,28 +415,103 @@ namespace AdvancedUI.Editor
             });
         }
 
-        // ─── RIPPLE ──────────────────────────────────────────────────────────
+        // RIPPLE
 
         private void DrawRippleTab()
         {
             DrawSection("Ripple Effect", ColorRipple, () =>
             {
                 EditorGUILayout.PropertyField(_ripple, new GUIContent("Ripple Component",
-                    "Assign the UIButtonRipple component here. Add UIButtonRipple to a child GameObject of the button and drag it in."));
+                    "Assign the UIButtonRipple component here, or click Auto Setup to create and configure it automatically."));
 
                 if (_ripple.objectReferenceValue == null)
                 {
                     EditorGUILayout.HelpBox(
-                        "No UIButtonRipple assigned.\n" +
-                        "1. Add a child GameObject to your button\n" +
-                        "2. Add component: AdvancedUI → UI Button Ripple\n" +
-                        "3. Drag it into the field above.",
+                        "No UIButtonRipple assigned. Click Auto Setup to create one automatically, " +
+                        "or add UIButtonRipple to a child GameObject and drag it here.",
                         MessageType.Info);
+
+                    EditorGUILayout.Space(2);
+
+                    if (GUILayout.Button(new GUIContent("?  Auto Setup Ripple",
+                        "Creates a child GameObject, adds UIButtonRipple, configures its RectTransform and assigns it automatically.")))
+                    {
+                        AutoSetupRipple();
+                    }
+                }
+                else
+                {
+                    var ripple = (UIButtonRipple)_ripple.objectReferenceValue;
+                    EditorGUILayout.Space(4);
+
+                    EditorGUILayout.HelpBox(
+                        "Sync With Style: when enabled, Apply Style automatically sets the ripple color\n" +
+                        "to a tinted version of the highlighted background color.",
+                        MessageType.None);
+
+                    EditorGUILayout.Space(2);
+
+                    EditorGUILayout.BeginHorizontal();
+                    if (GUILayout.Button(new GUIContent("Remove Ripple", "Destroys the ripple component and clears the reference.")))
+                    {
+                        RemoveRipple(ripple);
+                    }
+                    EditorGUILayout.EndHorizontal();
                 }
             });
         }
 
-        // ─── HELPERS ─────────────────────────────────────────────────────────
+        private void AutoSetupRipple()
+        {
+            var btn = (AdvancedUIButton)target;
+
+            // Check if a UIButtonRipple already exists as a child
+            UIButtonRipple existing = btn.GetComponentInChildren<UIButtonRipple>();
+            if (existing != null)
+            {
+                _ripple.objectReferenceValue = existing;
+                serializedObject.ApplyModifiedProperties();
+                Debug.Log("[AdvancedUI] Found existing UIButtonRipple and assigned it.");
+                return;
+            }
+
+            Undo.RegisterFullObjectHierarchyUndo(btn.gameObject, "Auto Setup Ripple");
+
+            GameObject go = new GameObject("Ripple");
+            Undo.RegisterCreatedObjectUndo(go, "Create Ripple GameObject");
+            go.transform.SetParent(btn.transform, false);
+
+            // Place at end of hierarchy so it renders on top of background, under label
+            go.transform.SetAsLastSibling();
+
+            RectTransform rt = go.AddComponent<RectTransform>();
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.offsetMin = Vector2.zero;
+            rt.offsetMax = Vector2.zero;
+            rt.anchoredPosition = Vector2.zero;
+
+            UIButtonRipple ripple = go.AddComponent<UIButtonRipple>();
+            _ripple.objectReferenceValue = ripple;
+            serializedObject.ApplyModifiedProperties();
+
+            // Sync color if a style is already applied
+            if (btn.EditorStyle != null)
+                ripple.ApplyStyle(btn.EditorStyle);
+
+            Debug.Log("[AdvancedUI] Ripple created and configured. Move it between Background and Label in the hierarchy, then add RectMask2D to the button root.");
+        }
+
+        private void RemoveRipple(UIButtonRipple ripple)
+        {
+            if (ripple == null) return;
+            Undo.RegisterFullObjectHierarchyUndo(((AdvancedUIButton)target).gameObject, "Remove Ripple");
+            _ripple.objectReferenceValue = null;
+            serializedObject.ApplyModifiedProperties();
+            Undo.DestroyObjectImmediate(ripple.gameObject);
+        }
+
+        // HELPERS
 
         private static void DrawStateColorsCompact(SerializedProperty colors)
         {

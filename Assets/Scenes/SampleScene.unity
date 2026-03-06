@@ -119,6 +119,61 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &180647969
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 180647970}
+  - component: {fileID: 180647971}
+  m_Layer: 0
+  m_Name: Ripple
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &180647970
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180647969}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1908164495}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &180647971
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 180647969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f54de58e66e071d4fb1c6cf6ff6e4fae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: AdvancedUI.Runtime::AdvancedUI.UIButtonRipple
+  _rippleColor: {r: 0.92, g: 0.92, b: 0.92, a: 0.3}
+  _sprite: {fileID: 0}
+  _duration: 0.45
+  _expandEasing: 2
+  _poolSize: 3
+  _ignoreTimeScale: 1
+  _syncWithStyle: 1
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,60 +438,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1 &511687817
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 511687818}
-  - component: {fileID: 511687819}
-  m_Layer: 5
-  m_Name: Ripple
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!224 &511687818
-RectTransform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 511687817}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1908164495}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &511687819
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 511687817}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f54de58e66e071d4fb1c6cf6ff6e4fae, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::AdvancedUI.UIButtonRipple
-  _rippleColor: {r: 1, g: 0, b: 0, a: 0.25}
-  _sprite: {fileID: 0}
-  _duration: 0.45
-  _expandEasing: 2
-  _poolSize: 3
-  _ignoreTimeScale: 1
 --- !u!1 &686183858
 GameObject:
   m_ObjectHideFlags: 0
@@ -912,8 +913,8 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1036433415}
-  - {fileID: 511687818}
   - {fileID: 726627331}
+  - {fileID: 180647970}
   m_Father: {fileID: 686183862}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -967,68 +968,44 @@ MonoBehaviour:
       m_Calls: []
   _style: {fileID: 11400000, guid: 1fb8a822b2979cf4aa773e3b599d500a, type: 2}
   _animator:
-    graphicEntries:
-    - target: {fileID: 1036433416}
-      role: 1
-      colors:
-        normal: {r: 0.25729796, g: 0.9245283, b: 0.3436454, a: 1}
-        highlighted: {r: 0.92, g: 0.92, b: 0.92, a: 1}
-        pressed: {r: 0.75, g: 0.75, b: 0.75, a: 1}
-        selected: {r: 0.78, g: 0.85, b: 1, a: 1}
-        selectedHighlighted: {r: 0.68, g: 0.76, b: 0.98, a: 1}
-        focused: {r: 0.88, g: 0.92, b: 1, a: 1}
-        disabled: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
-      duration: 0.1
-      easing: 2
-    - target: {fileID: 726627332}
-      role: 2
-      colors:
-        normal: {r: 1, g: 1, b: 1, a: 1}
-        highlighted: {r: 0.92, g: 0.92, b: 0.92, a: 1}
-        pressed: {r: 0.75, g: 0.75, b: 0.75, a: 1}
-        selected: {r: 0.78, g: 0.85, b: 1, a: 1}
-        selectedHighlighted: {r: 0.68, g: 0.76, b: 0.98, a: 1}
-        focused: {r: 0.88, g: 0.92, b: 1, a: 1}
-        disabled: {r: 0.5, g: 0.5, b: 0.5, a: 0.5}
-      duration: 0.1
-      easing: 2
-    transformSettings:
-      enabled: 1
-      states:
+    _graphicEntries: []
+    _transformSettings:
+      _enabled: 1
+      _states:
         normalScale: {x: 1, y: 1, z: 1}
         highlightedScale: {x: 1.05, y: 1.05, z: 1}
         pressedScale: {x: 0.95, y: 0.95, z: 1}
         selectedScale: {x: 1, y: 1, z: 1}
         focusedScale: {x: 1.02, y: 1.02, z: 1}
         disabledScale: {x: 1, y: 1, z: 1}
-      duration: 0.12
-      easing: 0
+      _duration: 0.12
+      _easing: 0
   _audio:
-    enabled: 0
-    source: {fileID: 0}
-    onHoverEnter: {fileID: 0}
-    onPress: {fileID: 0}
-    onSelect: {fileID: 0}
-    onDeselect: {fileID: 0}
-    onDisabled: {fileID: 0}
-    volume: 1
-    pitch: 1
-    randomizePitch: 0
-    pitchVariance: 0.1
+    _enabled: 0
+    _source: {fileID: 0}
+    _onHoverEnter: {fileID: 0}
+    _onPress: {fileID: 0}
+    _onSelect: {fileID: 0}
+    _onDeselect: {fileID: 0}
+    _onDisabled: {fileID: 0}
+    _volume: 1
+    _pitch: 1
+    _randomizePitch: 0
+    _pitchVariance: 0.1
   _mode: 0
   _holdSettings:
-    duration: 1
-    cancelOnExit: 1
-    OnHoldComplete:
+    _duration: 1
+    _cancelOnExit: 1
+    _onHoldProgress:
       m_PersistentCalls:
         m_Calls: []
-    OnHoldProgress:
+    _onHoldComplete:
       m_PersistentCalls:
         m_Calls: []
   _ignoreTimeScale: 1
   _isSelected: 0
   _toggleGroup: {fileID: 0}
-  _ripple: {fileID: 511687819}
+  _ripple: {fileID: 180647971}
   _onHoverEnter:
     m_PersistentCalls:
       m_Calls: []

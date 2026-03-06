@@ -1,3 +1,6 @@
+// AdvancedUIButton -- Advanced UI Button System for Unity
+// Copyright (c) 2025 AdvancedUI. All rights reserved.
+
 using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,14 +9,14 @@ namespace AdvancedUI
 {
     /// <summary>
     /// Ripple effect for AdvancedUIButton.
-    /// Uses a pre-allocated pool of Image components — works in any render pipeline,
+    /// Uses a pre-allocated pool of Image components -- works in any render pipeline,
     /// no custom shader required, zero GC allocation at runtime after initialization.
     /// </summary>
     [AddComponentMenu("AdvancedUI/UI Button Ripple")]
     [RequireComponent(typeof(RectTransform))]
     public sealed class UIButtonRipple : MonoBehaviour
     {
-        // ── Configuration ─────────────────────────────────────────────────────
+        // Configuration
 
         [Tooltip("Color of the ripple. Keep alpha between 0.15 and 0.35.")]
         [SerializeField] private Color _rippleColor = new Color(1f, 1f, 1f, 0.25f);
@@ -33,7 +36,10 @@ namespace AdvancedUI
         [Tooltip("When enabled, animations use unscaledDeltaTime.")]
         [SerializeField] private bool _ignoreTimeScale = true;
 
-        // ── Pool ──────────────────────────────────────────────────────────────
+        [Tooltip("When enabled, ApplyStyle() on the parent button automatically derives the ripple color from the style's highlighted background color.")]
+        [SerializeField] private bool _syncWithStyle = true;
+
+        // Pool
 
         private struct RippleEntry
         {
@@ -49,7 +55,7 @@ namespace AdvancedUI
         private Coroutine _tickCoroutine;
         private float _maxSize;
 
-        // ── Lifecycle ─────────────────────────────────────────────────────────
+        // Lifecycle
 
         private void Awake()
         {
@@ -72,7 +78,20 @@ namespace AdvancedUI
             RecalculateSize();
         }
 
-        // ── Public API ────────────────────────────────────────────────────────
+        // Public API
+
+        public bool SyncWithStyle => _syncWithStyle;
+
+        /// <summary>
+        /// Called by AdvancedUIButton.ApplyStyle when SyncWithStyle is enabled.
+        /// Derives ripple color from the style highlighted background color.
+        /// </summary>
+        public void ApplyStyle(UIButtonStyle style)
+        {
+            if (!_syncWithStyle || style == null) return;
+            Color highlighted = style.background.colors.highlighted;
+            _rippleColor = new Color(highlighted.r, highlighted.g, highlighted.b, 0.30f);
+        }
 
         /// <summary>Spawns a ripple at the given screen position.</summary>
         public void Spawn(Vector2 screenPosition)
@@ -117,9 +136,9 @@ namespace AdvancedUI
             StartTick();
         }
 
-        // ── Pool construction ─────────────────────────────────────────────────
+        // Pool construction
 
-        // Generates a soft circle sprite at runtime — no external asset required.
+        // Generates a soft circle sprite at runtime -- no external asset required.
         // Texture is 64x64, created once and shared across the pool.
         private static Sprite s_circleSprite;
 
@@ -205,7 +224,7 @@ namespace AdvancedUI
             }
         }
 
-        // ── Animation tick ────────────────────────────────────────────────────
+        // Animation tick
 
         private void StartTick()
         {
@@ -255,7 +274,7 @@ namespace AdvancedUI
             _tickCoroutine = null;
         }
 
-        // ── Helpers ───────────────────────────────────────────────────────────
+        // Helpers
 
         private void RecalculateSize()
         {

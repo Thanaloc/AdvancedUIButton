@@ -1,38 +1,48 @@
+// AdvancedUIButton — Advanced UI Button System for Unity
+// Copyright (c) 2025 AdvancedUI. All rights reserved.
+
 using System.Collections;
 using UnityEngine;
 
 namespace AdvancedUI
 {
+    // ITweenValue is intentionally internal — it is an implementation detail
+    // of the tween system and not part of the public API surface.
+
     internal interface ITweenValue
     {
-        float Duration       { get; }
-        EasingType Easing    { get; }
+        float Duration { get; }
+        EasingType Easing { get; }
         bool IgnoreTimeScale { get; }
-        bool IsValid         { get; }
-        void TweenValue(float t);
+        bool IsValid { get; }
+        void TweenValue(float normalizedTime);
     }
 
     internal struct ColorTween : ITweenValue
     {
-        public delegate void ColorTweenCallback(Color c);
+        public delegate void ColorTweenCallback(Color color);
 
         private ColorTweenCallback _callback;
         private Color _start;
         private Color _target;
 
-        public float Duration       { get; private set; }
-        public EasingType Easing    { get; private set; }
+        public float Duration { get; private set; }
+        public EasingType Easing { get; private set; }
         public bool IgnoreTimeScale { get; private set; }
-        public bool IsValid         => _callback != null;
+        public bool IsValid => _callback != null;
 
-        public void Set(Color start, Color target, float duration, EasingType easing, bool ignoreTimeScale, ColorTweenCallback callback)
+        public void Set(
+            Color start, Color target,
+            float duration, EasingType easing,
+            bool ignoreTimeScale,
+            ColorTweenCallback callback)
         {
-            _start       = start;
-            _target      = target;
-            Duration       = duration;
-            Easing         = easing;
+            _start = start;
+            _target = target;
+            Duration = duration;
+            Easing = easing;
             IgnoreTimeScale = ignoreTimeScale;
-            _callback    = callback;
+            _callback = callback;
         }
 
         public void TweenValue(float t)
@@ -43,25 +53,29 @@ namespace AdvancedUI
 
     internal struct Vector3Tween : ITweenValue
     {
-        public delegate void Vector3TweenCallback(Vector3 v);
+        public delegate void Vector3TweenCallback(Vector3 value);
 
         private Vector3TweenCallback _callback;
         private Vector3 _start;
         private Vector3 _target;
 
-        public float Duration       { get; private set; }
-        public EasingType Easing    { get; private set; }
+        public float Duration { get; private set; }
+        public EasingType Easing { get; private set; }
         public bool IgnoreTimeScale { get; private set; }
-        public bool IsValid         => _callback != null;
+        public bool IsValid => _callback != null;
 
-        public void Set(Vector3 start, Vector3 target, float duration, EasingType easing, bool ignoreTimeScale, Vector3TweenCallback callback)
+        public void Set(
+            Vector3 start, Vector3 target,
+            float duration, EasingType easing,
+            bool ignoreTimeScale,
+            Vector3TweenCallback callback)
         {
-            _start       = start;
-            _target      = target;
-            Duration       = duration;
-            Easing         = easing;
+            _start = start;
+            _target = target;
+            Duration = duration;
+            Easing = easing;
             IgnoreTimeScale = ignoreTimeScale;
-            _callback    = callback;
+            _callback = callback;
         }
 
         public void TweenValue(float t)
@@ -70,17 +84,27 @@ namespace AdvancedUI
         }
     }
 
-    internal class TweenRunner<T> where T : struct, ITweenValue
+    /// <summary>
+    /// Lightweight coroutine-based tween engine.
+    /// Runs a single tween at a time; starting a new tween automatically stops the previous one.
+    /// Uses struct-based tween values to avoid GC allocations in steady state.
+    /// </summary>
+    internal sealed class TweenRunner<T> where T : struct, ITweenValue
     {
         private MonoBehaviour _host;
         private IEnumerator _runningTween;
 
+        /// <summary>Must be called once before starting any tween.</summary>
         public void Init(MonoBehaviour host)
         {
             _host = host;
         }
 
-        public void StartTween(T value, bool immediate = false)
+        /// <summary>
+        /// Starts a tween. If a tween is already running it is stopped first.
+        /// If the host is inactive or duration is zero, the final value is applied immediately.
+        /// </summary>
+        public void StartTween(T value)
         {
             if (_host == null) return;
 
@@ -88,7 +112,7 @@ namespace AdvancedUI
 
             if (!value.IsValid) return;
 
-            if (immediate || value.Duration <= 0f || !_host.gameObject.activeInHierarchy)
+            if (value.Duration <= 0f || !_host.gameObject.activeInHierarchy)
             {
                 value.TweenValue(1f);
                 return;
@@ -98,10 +122,11 @@ namespace AdvancedUI
             _host.StartCoroutine(_runningTween);
         }
 
+        /// <summary>Stops the running tween without snapping to the target value.</summary>
         public void StopTween()
         {
             if (_runningTween == null) return;
-            _host.StopCoroutine(_runningTween);
+            _host?.StopCoroutine(_runningTween);
             _runningTween = null;
         }
 

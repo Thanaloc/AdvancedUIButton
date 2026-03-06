@@ -1,85 +1,119 @@
-using System;
+// AdvancedUIButton -- Advanced UI Button System for Unity
+// Copyright (c) 2025 AdvancedUI. All rights reserved.
+
 using UnityEngine;
 
 namespace AdvancedUI
 {
-    [Serializable]
-    public class UIButtonAudio : IButtonModule
+    /// <summary>
+    /// Handles audio feedback for button state changes.
+    /// Attach an AudioSource to any persistent GameObject and assign it here.
+    /// </summary>
+    [System.Serializable]
+    public sealed class UIButtonAudio : IButtonModule
     {
-        public bool         enabled         = false;
-        public AudioSource  source;
+        // Serialized fields
 
-        [Space]
-        public AudioClip    onHoverEnter;
-        public AudioClip    onPress;
-        public AudioClip    onSelect;
-        public AudioClip    onDeselect;
-        public AudioClip    onDisabled;
+        [Tooltip("Enable audio feedback on state changes.")]
+        [SerializeField] private bool _enabled;
 
-        [Space]
-        [Range(0f, 1f)]  public float volume          = 1f;
-        [Range(0.5f, 2f)] public float pitch          = 1f;
-        public bool randomizePitch                    = false;
-        [Range(0f, 0.3f)] public float pitchVariance  = 0.1f;
+        [Tooltip("AudioSource used to play clips. Can live on any persistent GameObject.")]
+        [SerializeField] private AudioSource _source;
 
-        private AdvancedUIButton _button;
+        [Header("Clips")]
+        [Tooltip("Played when the pointer enters the button.")]
+        [SerializeField] private AudioClip _onHoverEnter;
 
-        public void Initialize(AdvancedUIButton button)
-        {
-            _button = button;
-        }
+        [Tooltip("Played when the button is pressed.")]
+        [SerializeField] private AudioClip _onPress;
+
+        [Tooltip("Played when the button is selected (Toggle/Radio on).")]
+        [SerializeField] private AudioClip _onSelect;
+
+        [Tooltip("Played when the button is deselected (Toggle/Radio off).")]
+        [SerializeField] private AudioClip _onDeselect;
+
+        [Tooltip("Played when the button becomes disabled while hovered.")]
+        [SerializeField] private AudioClip _onDisabled;
+
+        [Header("Settings")]
+        [Tooltip("Playback volume multiplier applied to all clips.")]
+        [SerializeField, Range(0f, 1f)] private float _volume = 1f;
+
+        [Tooltip("Base pitch applied to all clips.")]
+        [SerializeField, Range(0.5f, 2f)] private float _pitch = 1f;
+
+        [Tooltip("Adds a random offset to pitch on each play, preventing repetition fatigue.")]
+        [SerializeField] private bool _randomizePitch;
+
+        [Tooltip("Maximum random pitch offset applied in either direction.")]
+        [SerializeField, Range(0f, 0.3f)] private float _pitchVariance = 0.1f;
+
+        // IButtonModule
+
+        public void Initialize(AdvancedUIButton button) { }
 
         public void OnStateChanged(ButtonState previous, ButtonState next, bool immediate)
         {
-            if (!enabled || immediate) return;
+            if (!_enabled || immediate) return;
 
             switch (next)
             {
                 case ButtonState.Highlighted:
                 case ButtonState.SelectedHighlighted:
-                    if (previous != ButtonState.Highlighted && previous != ButtonState.SelectedHighlighted)
-                        Play(onHoverEnter);
+                    // Only play hover sound when entering hover from a non-hover state.
+                    if (previous != ButtonState.Highlighted &&
+                        previous != ButtonState.SelectedHighlighted)
+                        Play(_onHoverEnter);
                     break;
 
                 case ButtonState.Pressed:
-                    Play(onPress);
+                    Play(_onPress);
                     break;
 
                 case ButtonState.Selected:
-                    Play(previous == ButtonState.Selected ? onDeselect : onSelect);
+                    Play(previous == ButtonState.Selected ? _onDeselect : _onSelect);
+                    break;
+
+                case ButtonState.Normal:
+                    if (previous == ButtonState.Selected)
+                        Play(_onDeselect);
                     break;
 
                 case ButtonState.Disabled:
-                    Play(onDisabled);
+                    Play(_onDisabled);
                     break;
             }
         }
 
+        // Public API
+
+        /// <summary>Plays a clip through the assigned AudioSource.</summary>
         public void Play(AudioClip clip)
         {
-            if (!enabled || source == null || clip == null) return;
+            if (!_enabled || _source == null || clip == null) return;
 
-            float p = randomizePitch
-                ? pitch + UnityEngine.Random.Range(-pitchVariance, pitchVariance)
-                : pitch;
+            _source.pitch = _randomizePitch
+                ? _pitch + Random.Range(-_pitchVariance, _pitchVariance)
+                : _pitch;
 
-            source.pitch = p;
-            source.PlayOneShot(clip, volume);
+            _source.PlayOneShot(clip, _volume);
         }
 
+        /// <summary>Applies audio settings from a UIButtonStyle asset.</summary>
         public void ApplyStyle(UIButtonStyle style)
         {
             if (style == null) return;
 
-            var a        = style.audio;
-            onHoverEnter = a.hoverEnter;
-            onPress      = a.press;
-            onSelect     = a.select;
-            onDisabled   = a.disabled;
-            volume       = a.volume;
-            pitch        = a.pitch;
-            randomizePitch   = a.randomizePitch;
-            pitchVariance    = a.pitchVariance;
+            UIButtonStyle.AudioStyle a = style.audio;
+            _onHoverEnter = a.hoverEnter;
+            _onPress = a.press;
+            _onSelect = a.select;
+            _onDisabled = a.disabled;
+            _volume = a.volume;
+            _pitch = a.pitch;
+            _randomizePitch = a.randomizePitch;
+            _pitchVariance = a.pitchVariance;
         }
     }
 }

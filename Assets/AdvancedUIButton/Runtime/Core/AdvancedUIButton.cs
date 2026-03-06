@@ -1,3 +1,7 @@
+// AdvancedUIButton -- Advanced UI Button System for Unity
+// Copyright (c) 2025 AdvancedUI. All rights reserved.
+// Version 1.0.0
+
 using System;
 using System.Collections;
 using UnityEngine;
@@ -7,29 +11,63 @@ using UnityEngine.UI;
 
 namespace AdvancedUI
 {
+    /// <summary>
+    /// Drop-in replacement for Unity's Button component with extended state machine,
+    /// multi-graphic transitions, ripple effect, and ScriptableObject-based styling.
+    /// Supports Standard, Toggle, Radio, and Hold interaction modes.
+    /// </summary>
     [AddComponentMenu("AdvancedUI/Advanced UI Button")]
+    [DisallowMultipleComponent]
     [RequireComponent(typeof(RectTransform))]
-    public class AdvancedUIButton : Button
+    public sealed class AdvancedUIButton : Button
     {
+        // Nested types
+
+        /// <summary>Settings for Hold interaction mode.</summary>
         [Serializable]
-        public class HoldSettings
+        public sealed class HoldSettings
         {
-            public float duration = 1f;
-            public bool cancelOnExit = true;
-            public UnityEvent OnHoldComplete = new UnityEvent();
-            public UnityEvent<float> OnHoldProgress = new UnityEvent<float>();
+            [Tooltip("Duration in seconds the user must hold to trigger OnHoldComplete.")]
+            [SerializeField, Min(0.1f)] private float _duration = 1f;
+
+            [Tooltip("If enabled, moving the pointer outside the button cancels the hold.")]
+            [SerializeField] private bool _cancelOnExit = true;
+
+            /// <summary>Fired every frame while holding. Value is normalized progress 0-1.</summary>
+            [SerializeField] private UnityEvent<float> _onHoldProgress = new UnityEvent<float>();
+
+            /// <summary>Fired once when the hold duration is fully elapsed.</summary>
+            [SerializeField] private UnityEvent _onHoldComplete = new UnityEvent();
+
+            public float Duration => _duration;
+            public bool CancelOnExit => _cancelOnExit;
+            public UnityEvent<float> OnHoldProgress => _onHoldProgress;
+            public UnityEvent OnHoldComplete => _onHoldComplete;
         }
 
+        // Serialized fields
+
+        [Tooltip("Optional ScriptableObject style asset. Click Apply Style after assigning.")]
         [SerializeField] private UIButtonStyle _style;
+
         [SerializeField] private UIButtonAnimator _animator = new UIButtonAnimator();
         [SerializeField] private UIButtonAudio _audio = new UIButtonAudio();
+
+        [Tooltip("Determines how the button responds to clicks.")]
         [SerializeField] private InteractionMode _mode = InteractionMode.Standard;
+
         [SerializeField] private HoldSettings _holdSettings = new HoldSettings();
+
+        [Tooltip("When enabled, all animations use unscaledDeltaTime and remain responsive while the game is paused.")]
         [SerializeField] private bool _ignoreTimeScale = true;
-        [SerializeField] private bool _isSelected = false;
+
+        [Tooltip("Initial selection state. Used by Toggle and Radio modes.")]
+        [SerializeField] private bool _isSelected;
+
+        [Tooltip("The toggle group this button belongs to. Used with Radio and Toggle modes.")]
         [SerializeField] private UIButtonToggleGroup _toggleGroup;
 
-        [Tooltip("Optional ripple effect component. Assign a UIButtonRipple on a child GameObject.")]
+        [Tooltip("Optional ripple effect component on a child GameObject.")]
         [SerializeField] private UIButtonRipple _ripple;
 
         [Space]
@@ -41,27 +79,51 @@ namespace AdvancedUI
         [SerializeField] private UnityEvent _onDeselected = new UnityEvent();
         [SerializeField] private UnityEvent _onHoldComplete = new UnityEvent();
 
+        // C# events
+
+        /// <summary>Raised when the pointer enters the button.</summary>
         public event Action OnHoverEnterEvent;
+
+        /// <summary>Raised when the pointer exits the button.</summary>
         public event Action OnHoverExitEvent;
+
+        /// <summary>Raised when the button is pressed.</summary>
         public event Action OnPressEvent;
+
+        /// <summary>Raised when the button is released.</summary>
         public event Action OnReleaseEvent;
+
+        /// <summary>Raised when the selection state changes. Argument is the new state.</summary>
         public event Action<bool> OnSelectionChangedEvent;
 
+        // Public properties
+
+        /// <summary>The current resolved button state.</summary>
         public ButtonState CurrentState { get; private set; } = ButtonState.Normal;
+
+        /// <summary>Whether the button is currently in a selected/toggled-on state.</summary>
         public bool IsToggleOn => _isSelected;
+
+        /// <summary>Whether animations use unscaledDeltaTime.</summary>
         public bool IgnoreTimeScale => _ignoreTimeScale;
+
+        /// <summary>The active interaction mode.</summary>
         public InteractionMode Mode => _mode;
 
-        private bool _isPointerOver = false;
-        private bool _isPressed = false;
-        private bool _isFocused = false;
-        private Coroutine _holdCoroutine;
+        // Private state
 
+        private bool _isPointerOver;
+        private bool _isPressed;
+        private bool _isFocused;
+        private Coroutine _holdCoroutine;
         private bool _modulesInitialized;
+
+        // Lifecycle
 
         protected override void Awake()
         {
             base.Awake();
+            // Disable Unity's built-in transition system -- we handle everything.
             transition = Transition.None;
         }
 
@@ -71,14 +133,14 @@ namespace AdvancedUI
             InitializeModules();
             _modulesInitialized = true;
             ApplyStyle(_style);
-            RefreshState(true);
+            RefreshState(immediate: true);
         }
 
         protected override void OnEnable()
         {
             base.OnEnable();
             if (!_modulesInitialized) return;
-            RefreshState(true);
+            RefreshState(immediate: true);
         }
 
         protected override void OnDisable()
@@ -89,29 +151,33 @@ namespace AdvancedUI
             _isPressed = false;
             _isFocused = false;
             StopHold();
-            RefreshState(true);
+            RefreshState(immediate: true);
         }
 
-        private void InitializeModules()
-        {
-            _animator.Initialize(this);
-            _audio.Initialize(this);
-        }
+        // Public API
 
+        /// <summary>
+        /// Applies a UIButtonStyle asset, pushing its colors and animation
+        /// settings to all graphic entries and the ripple component.
+        /// </summary>
+        /// <param name="style">The style asset to apply. Pass null to clear.</param>
         public void ApplyStyle(UIButtonStyle style)
         {
             _style = style;
             if (style == null) return;
             _animator.ApplyStyle(style);
             _audio.ApplyStyle(style);
-            RefreshState(true);
+            _ripple?.ApplyStyle(style);
+            RefreshState(immediate: true);
         }
 
+        /// <summary>Sets the selected state programmatically.</summary>
+        /// <param name="selected">The desired selection state.</param>
         public void SetSelected(bool selected)
         {
             if (_isSelected == selected) return;
             _isSelected = selected;
-            RefreshState(false);
+            RefreshState(immediate: false);
 
             if (selected)
             {
@@ -126,14 +192,26 @@ namespace AdvancedUI
             OnSelectionChangedEvent?.Invoke(_isSelected);
         }
 
+        /// <summary>Toggles the current selection state.</summary>
         public void ToggleSelection() => SetSelected(!_isSelected);
+
+        /// <summary>Sets the button's interactable state and refreshes its visual state.</summary>
+        public void SetInteractable(bool value)
+        {
+            interactable = value;
+            RefreshState(immediate: false);
+        }
+
+        /// <summary>Forces an immediate visual refresh without animation.</summary>
+        public void ForceRefresh() => RefreshState(immediate: true);
+
+        // Pointer events
 
         public override void OnPointerEnter(PointerEventData eventData)
         {
             base.OnPointerEnter(eventData);
             _isPointerOver = true;
-            RefreshState(false);
-
+            RefreshState(immediate: false);
             if (!interactable) return;
             _onHoverEnter.Invoke();
             OnHoverEnterEvent?.Invoke();
@@ -143,9 +221,9 @@ namespace AdvancedUI
         {
             base.OnPointerExit(eventData);
             _isPointerOver = false;
-            RefreshState(false);
+            RefreshState(immediate: false);
 
-            if (_mode == InteractionMode.Hold && _holdSettings.cancelOnExit)
+            if (_mode == InteractionMode.Hold && _holdSettings.CancelOnExit)
                 StopHold();
 
             _onHoverExit.Invoke();
@@ -158,7 +236,7 @@ namespace AdvancedUI
             if (!interactable) return;
 
             _isPressed = true;
-            RefreshState(false);
+            RefreshState(immediate: false);
             _ripple?.Spawn(eventData.position);
             _onPress.Invoke();
             OnPressEvent?.Invoke();
@@ -171,7 +249,7 @@ namespace AdvancedUI
         {
             base.OnPointerUp(eventData);
             _isPressed = false;
-            RefreshState(false);
+            RefreshState(immediate: false);
             StopHold();
             _onRelease.Invoke();
             OnReleaseEvent?.Invoke();
@@ -195,27 +273,26 @@ namespace AdvancedUI
             ClearPointerFocus(eventData);
         }
 
-        // Clears EventSystem focus after a mouse/touch click so the button
-        // does not stay in Focused state. Keyboard and gamepad navigation
-        // are not affected because they never trigger pointer events.
-        private static void ClearPointerFocus(PointerEventData eventData)
-        {
-            if (eventData.pointerId >= -1)
-                UnityEngine.EventSystems.EventSystem.current?.SetSelectedGameObject(null);
-        }
-
         public override void OnSelect(BaseEventData eventData)
         {
             base.OnSelect(eventData);
             _isFocused = true;
-            RefreshState(false);
+            RefreshState(immediate: false);
         }
 
         public override void OnDeselect(BaseEventData eventData)
         {
             base.OnDeselect(eventData);
             _isFocused = false;
-            RefreshState(false);
+            RefreshState(immediate: false);
+        }
+
+        // Private implementation
+
+        private void InitializeModules()
+        {
+            _animator.Initialize(this);
+            _audio.Initialize(this);
         }
 
         private ButtonState ResolveState()
@@ -231,11 +308,10 @@ namespace AdvancedUI
 
         private void RefreshState(bool immediate)
         {
-            ButtonState previous = CurrentState;
             ButtonState next = ResolveState();
+            if (CurrentState == next && !immediate) return;
 
-            if (previous == next && !immediate) return;
-
+            ButtonState previous = CurrentState;
             CurrentState = next;
             _animator.OnStateChanged(previous, next, immediate);
             _audio.OnStateChanged(previous, next, immediate);
@@ -258,7 +334,7 @@ namespace AdvancedUI
         private IEnumerator HoldRoutine()
         {
             float elapsed = 0f;
-            float duration = _holdSettings.duration;
+            float duration = _holdSettings.Duration;
 
             while (elapsed < duration)
             {
@@ -271,13 +347,15 @@ namespace AdvancedUI
             _onHoldComplete.Invoke();
         }
 
-        public void SetInteractable(bool value)
+        // Clears EventSystem focus after a mouse/touch click.
+        // Keyboard and gamepad navigation are not affected (they use pointerId < -1).
+        private static void ClearPointerFocus(PointerEventData eventData)
         {
-            interactable = value;
-            RefreshState(false);
+            if (eventData.pointerId >= -1)
+                EventSystem.current?.SetSelectedGameObject(null);
         }
 
-        public void ForceRefresh() => RefreshState(true);
+        // Editor support
 
 #if UNITY_EDITOR
         protected override void OnValidate()
@@ -286,6 +364,8 @@ namespace AdvancedUI
             transition = Transition.None;
         }
 
+        // Editor-only accessors for the custom Inspector.
+        // Prefixed with Editor to make clear they are not part of the runtime API.
         public UIButtonStyle EditorStyle => _style;
         public UIButtonAnimator EditorAnimator => _animator;
         public UIButtonAudio EditorAudio => _audio;
