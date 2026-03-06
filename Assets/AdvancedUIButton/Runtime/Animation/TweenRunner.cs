@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace AdvancedUI
 {
-    // ITweenValue is intentionally internal — it is an implementation detail
+    // ITweenValue is intentionally internal -- it is an implementation detail
     // of the tween system and not part of the public API surface.
 
     internal interface ITweenValue
