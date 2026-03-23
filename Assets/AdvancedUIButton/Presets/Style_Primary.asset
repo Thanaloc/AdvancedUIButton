@@ -57,6 +57,7 @@ MonoBehaviour:
     hoverEnter: {fileID: 0}
     press: {fileID: 0}
     select: {fileID: 0}
+    deselect: {fileID: 0}
     disabled: {fileID: 0}
     volume: 1
     pitch: 1
