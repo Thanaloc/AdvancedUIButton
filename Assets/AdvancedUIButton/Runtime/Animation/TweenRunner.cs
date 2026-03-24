@@ -1,4 +1,4 @@
-// AdvancedUIButton — Advanced UI Button System for Unity
+// AdvancedUIButton - Advanced UI Button System for Unity
 // Copyright (c) 2025 AdvancedUI. All rights reserved.
 
 using System.Collections;
